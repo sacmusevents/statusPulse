@@ -90,7 +90,7 @@ class OverlayService : Service() {
             }
 
             val params = WindowManager.LayoutParams(
-                280,
+                400,
                 height,
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                     WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
