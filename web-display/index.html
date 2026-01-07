@@ -52,13 +52,13 @@
     <script>
         const SUPABASE_URL = 'https://pgipjbsekpwzrjxjytxv.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_9sD73_OSr4EgV9UFslJykA_bRBS5Kgr';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let currentSessionId = null;
         let pollInterval = null;
 
         async function showSessions() {
-            const { data } = await supabase.from('sessions').select('*').eq('status', 'active');
+            const { data } = await db.from('sessions').select('*').eq('status', 'active');
             const list = document.getElementById('sessionList');
             const noSessions = document.getElementById('noSessions');
 
@@ -90,7 +90,7 @@
         }
 
         async function checkSignal() {
-            const { data } = await supabase.from('signals').select('color').eq('session_id', currentSessionId).single();
+            const { data } = await db.from('signals').select('color').eq('session_id', currentSessionId).single();
             if (data) {
                 updateLights(data.color);
             }
