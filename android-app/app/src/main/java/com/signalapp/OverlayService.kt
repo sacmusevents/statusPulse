@@ -104,7 +104,7 @@ class OverlayService : Service() {
         layoutParams.gravity = Gravity.TOP or Gravity.END
         layoutParams.x = 20
         layoutParams.y = 20
-        layoutParams.alpha = 0.7f
+        layoutParams.alpha = 1.0f
 
         windowManager.addView(overlayView, layoutParams)
         setupButtonListeners()
@@ -112,6 +112,11 @@ class OverlayService : Service() {
     }
 
     private fun setupTouchListener() {
+        val handler = Handler(Looper.getMainLooper())
+        val longPressRunnable = Runnable {
+            isMoving = true
+        }
+
         dragButton?.setOnTouchListener { _, event ->
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
@@ -119,7 +124,7 @@ class OverlayService : Service() {
                     lastY = event.rawY.toInt()
                     initialX = layoutParams.x
                     initialY = layoutParams.y
-                    isMoving = true
+                    handler.postDelayed(longPressRunnable, 500) // 500ms long press
                     true
                 }
                 MotionEvent.ACTION_MOVE -> {
@@ -135,6 +140,7 @@ class OverlayService : Service() {
                     true
                 }
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    handler.removeCallbacks(longPressRunnable)
                     isMoving = false
                     true
                 }
