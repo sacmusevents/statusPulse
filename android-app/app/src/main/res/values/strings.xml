@@ -1,5 +1,38 @@
 <resources>
-    <string name="app_name">Signal Lights</string>
+    <string name="app_name">StatusPulse</string>
+    <string name="app_tagline">Real-time feedback for any group</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_title">StatusPulse</string>
+    <string name="onboarding_subtitle">Share Your Status</string>
+    <string name="onboarding_description">Control a large display with just one tap.\nPerfect for classrooms, meetings, and teams.</string>
+    <string name="onboarding_how_it_works">How It Works</string>
+    <string name="onboarding_step1">1. Create a display on your phone</string>
+    <string name="onboarding_step2">2. Display it on a screen or projector</string>
+    <string name="onboarding_step3">3. Tap buttons to show your status</string>
+    <string name="onboarding_get_started">Get Started</string>
+
+    <!-- Session Management -->
+    <string name="action_create_display">Create Display</string>
+    <string name="action_join_display">Join Display</string>
+    <string name="label_choose_display">Choose Display</string>
+    <string name="label_active_displays">Active Displays</string>
+
+    <!-- Status Colors -->
+    <string name="status_red">Help</string>
+    <string name="status_yellow">Clarify</string>
+    <string name="status_green">Ready</string>
+
+    <!-- Connection Status -->
+    <string name="status_connected">Connected ✓</string>
+    <string name="status_disconnected">Disconnected</string>
+    <string name="status_connecting">Connecting...</string>
+
+    <!-- Button Actions -->
+    <string name="action_close">Close</string>
+    <string name="action_back">Back</string>
+    <string name="action_create">Create</string>
+    <string name="action_join">Join</string>
 
     <!-- Table Names -->
     <string name="table_sessions">sessions</string>
