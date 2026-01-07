@@ -37,6 +37,7 @@ class OverlayService : Service() {
     private var initialY = 0
     private var resetTimer: android.os.Handler? = null
     private val RESET_TIME = 10 * 1000L // 10 seconds
+    private var dragButton: Button? = null
 
     companion object {
         private var instance: OverlayService? = null
@@ -103,6 +104,7 @@ class OverlayService : Service() {
         layoutParams.gravity = Gravity.TOP or Gravity.END
         layoutParams.x = 20
         layoutParams.y = 20
+        layoutParams.alpha = 0.7f
 
         windowManager.addView(overlayView, layoutParams)
         setupButtonListeners()
@@ -110,19 +112,14 @@ class OverlayService : Service() {
     }
 
     private fun setupTouchListener() {
-        val handler = Handler(Looper.getMainLooper())
-        val longPressRunnable = Runnable {
-            isMoving = true
-        }
-
-        overlayView.setOnTouchListener { _, event ->
+        dragButton?.setOnTouchListener { _, event ->
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     lastX = event.rawX.toInt()
                     lastY = event.rawY.toInt()
                     initialX = layoutParams.x
                     initialY = layoutParams.y
-                    handler.postDelayed(longPressRunnable, 500) // 500ms long press
+                    isMoving = true
                     true
                 }
                 MotionEvent.ACTION_MOVE -> {
@@ -138,7 +135,6 @@ class OverlayService : Service() {
                     true
                 }
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                    handler.removeCallbacks(longPressRunnable)
                     isMoving = false
                     true
                 }
@@ -151,21 +147,11 @@ class OverlayService : Service() {
         val redButton: Button = overlayView.findViewById(R.id.red_button)
         val yellowButton: Button = overlayView.findViewById(R.id.yellow_button)
         val greenButton: Button = overlayView.findViewById(R.id.green_button)
-        val webButton: Button = overlayView.findViewById(R.id.web_button)
+        dragButton = overlayView.findViewById(R.id.drag_button)
 
         redButton.setOnClickListener { updateSignalColor("red") }
         yellowButton.setOnClickListener { updateSignalColor("yellow") }
         greenButton.setOnClickListener { updateSignalColor("green") }
-
-        webButton.setOnClickListener {
-            // Open web app in browser with session ID
-            // GitHub Pages URL: https://yourusername.github.io/red-yellow-green/
-            val webAppUrl = "https://yourusername.github.io/red-yellow-green/?session=${currentSessionId}"
-            val intent = Intent(Intent.ACTION_VIEW).apply {
-                data = android.net.Uri.parse(webAppUrl)
-            }
-            startActivity(intent)
-        }
     }
 
     private fun updateSignalColor(color: String) {
