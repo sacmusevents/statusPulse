@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="30dp"
+    android:background="@drawable/gradient_background">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Signal Lights"
+        android:textSize="36sp"
+        android:textStyle="bold"
+        android:textColor="#ffffff"
+        android:layout_marginBottom="20dp" />
+
+    <TextView
+        android:id="@+id/statusText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Checking permissions..."
+        android:textSize="14sp"
+        android:textColor="#b0bec5"
+        android:layout_marginBottom="50dp"
+        android:gravity="center" />
+
+    <Button
+        android:id="@+id/checkPermButton"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:text="Grant Overlay Permission"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:background="@drawable/button_permission"
+        android:textColor="#ffffff"
+        android:layout_marginBottom="20dp"
+        android:stateListAnimator="@null"
+        android:elevation="4dp" />
+
+    <Button
+        android:id="@+id/createSessionBtn"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:text="✚ Create New Session"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:background="@drawable/button_primary"
+        android:textColor="#ffffff"
+        android:layout_marginBottom="16dp"
+        android:stateListAnimator="@null"
+        android:elevation="4dp" />
+
+    <Button
+        android:id="@+id/joinSessionBtn"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:text="⊕ Join Existing Session"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:background="@drawable/button_secondary"
+        android:textColor="#ffffff"
+        android:stateListAnimator="@null"
+        android:elevation="4dp" />
+
+</LinearLayout>

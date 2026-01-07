@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Signal Lights</string>
+
+    <!-- Supabase Configuration -->
+    <string name="supabase_url">https://pgipjbsekpwzrjxjytxv.supabase.co</string>
+    <string name="supabase_anon_key">sb_publishable_9sD73_OSr4EgV9UFslJykA_bRBS5Kgr</string>
+
+    <!-- Table Names -->
+    <string name="table_sessions">sessions</string>
+    <string name="table_signals">signals</string>
+</resources>

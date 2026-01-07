@@ -1,0 +1,19 @@
+# Android/Gradle
+.gradle/
+.idea/
+*.iml
+build/
+*.apk
+*.aar
+local.properties
+
+# Web
+node_modules/
+dist/
+.DS_Store
+*.log
+
+# IDE
+.vscode/
+*.swp
+*.swo
