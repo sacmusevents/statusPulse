@@ -6,6 +6,7 @@ build/
 *.apk
 *.aar
 local.properties
+gradle.properties
 
 # Web
 node_modules/
@@ -17,3 +18,9 @@ dist/
 .vscode/
 *.swp
 *.swo
+
+# Environment and Secrets
+.env
+.env.local
+*.pem
+*.key

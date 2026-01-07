@@ -26,8 +26,8 @@ data class Signal(
 )
 
 object SupabaseManager {
-    private const val SUPABASE_URL = "https://pgipjbsekpwzrjxjytxv.supabase.co"
-    private const val SUPABASE_KEY = "sb_publishable_9sD73_OSr4EgV9UFslJykA_bRBS5Kgr"
+    private val SUPABASE_URL = BuildConfig.SUPABASE_URL
+    private val SUPABASE_KEY = BuildConfig.SUPABASE_KEY
 
     val httpClient = OkHttpClient.Builder()
         .connectTimeout(10, java.util.concurrent.TimeUnit.SECONDS)
