@@ -73,7 +73,7 @@ class OverlayService : Service() {
     private fun setupOverlay() {
         windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
 
-        // Create single overlay in top-left corner with 56dp height
+        // Create single overlay in top-left corner with 136dp height to accommodate large buttons
         val view = LayoutInflater.from(this).inflate(R.layout.overlay_layout, null)
 
         val closeButton: Button = view.findViewById(R.id.close_button)
@@ -83,7 +83,7 @@ class OverlayService : Service() {
 
         val params = WindowManager.LayoutParams(
             400,
-            56,
+            136,
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                 WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
             else

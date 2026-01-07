@@ -50,16 +50,16 @@
         }
 
         .session-title {
-            color: #ffffff;
-            font-size: 42px;
-            font-weight: 700;
-            margin-bottom: 20px;
+            color: #00ff00;
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 10px;
             text-align: center;
         }
 
         .session-subtitle {
             color: #888888;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 400;
             margin-bottom: 40px;
             text-align: center;
@@ -85,7 +85,7 @@
 
         .session-item:hover {
             background-color: #2a2a2a;
-            border-color: #2196F3;
+            border-color: #00ff00;
             transform: translateY(-5px);
         }
 
@@ -118,11 +118,11 @@
         }
 
         .status.connected {
-            color: rgba(0, 200, 83, 0.8);
+            color: rgba(0, 255, 0, 0.7);
         }
 
         .status.disconnected {
-            color: rgba(255, 77, 77, 0.8);
+            color: rgba(255, 100, 100, 0.7);
         }
 
         /* ============================================
@@ -136,7 +136,7 @@
 
         .header {
             text-align: center;
-            color: #ffffff;
+            color: #00ff00;
             font-size: 24px;
             font-weight: bold;
             margin-bottom: 20px;
@@ -147,7 +147,7 @@
         }
 
         .back-btn {
-            background-color: #2196F3;
+            background-color: #333333;
             color: #ffffff;
             border: none;
             padding: 10px 20px;
@@ -155,11 +155,10 @@
             cursor: pointer;
             font-size: 14px;
             transition: background-color 0.3s ease;
-            font-weight: 600;
         }
 
         .back-btn:hover {
-            background-color: #1976D2;
+            background-color: #555555;
         }
 
         .lights-container {
@@ -187,30 +186,30 @@
         }
 
         .light.red {
-            background-color: #FF4D4D;
+            background-color: #ff0000;
         }
 
         .light.red.active {
             opacity: 1;
-            box-shadow: 0 0 50px rgba(255, 77, 77, 0.8), inset 0 0 20px rgba(255, 77, 77, 0.4);
+            box-shadow: 0 0 50px rgba(255, 0, 0, 0.8), inset 0 0 20px rgba(255, 0, 0, 0.4);
         }
 
         .light.yellow {
-            background-color: #FFD700;
+            background-color: #ffff00;
         }
 
         .light.yellow.active {
             opacity: 1;
-            box-shadow: 0 0 50px rgba(255, 215, 0, 0.8), inset 0 0 20px rgba(255, 215, 0, 0.4);
+            box-shadow: 0 0 50px rgba(255, 255, 0, 0.8), inset 0 0 20px rgba(255, 255, 0, 0.4);
         }
 
         .light.green {
-            background-color: #4CAF50;
+            background-color: #00ff00;
         }
 
         .light.green.active {
             opacity: 1;
-            box-shadow: 0 0 50px rgba(76, 175, 80, 0.8), inset 0 0 20px rgba(76, 175, 80, 0.4);
+            box-shadow: 0 0 50px rgba(0, 255, 0, 0.8), inset 0 0 20px rgba(0, 255, 0, 0.4);
         }
 
         .light.inactive {
@@ -246,27 +245,13 @@
                 <div style="width: 120px;"></div>
             </div>
             <div class="lights-container">
-                <div class="light red" id="redLight">●</div>
-                <div class="light yellow" id="yellowLight">●</div>
-                <div class="light green active" id="greenLight">●</div>
-            </div>
-            <div style="display: flex; gap: 40px; margin-top: 40px; font-size: 14px;">
-                <div style="text-align: center;">
-                    <div style="color: #ff4d4d; font-weight: bold;">●</div>
-                    <div style="color: #888; margin-top: 8px; font-size: 12px;">Help</div>
-                </div>
-                <div style="text-align: center;">
-                    <div style="color: #ffd700; font-weight: bold;">●</div>
-                    <div style="color: #888; margin-top: 8px; font-size: 12px;">Clarify</div>
-                </div>
-                <div style="text-align: center;">
-                    <div style="color: #4caf50; font-weight: bold;">●</div>
-                    <div style="color: #888; margin-top: 8px; font-size: 12px;">Ready</div>
-                </div>
+                <div class="light red" id="redLight">RED</div>
+                <div class="light yellow" id="yellowLight">YELLOW</div>
+                <div class="light green active" id="greenLight">GREEN</div>
             </div>
             <div class="footer">
-                <div id="footer-info">Waiting for input...</div>
-                <div id="realtime-status" style="margin-top: 10px; font-size: 11px; color: #888;">Live Status Display</div>
+                <div id="footer-info">Connected to session</div>
+                <div id="realtime-status" style="margin-top: 10px; font-size: 11px; color: #888;">Realtime: Connected</div>
             </div>
         </div>
     </div>
