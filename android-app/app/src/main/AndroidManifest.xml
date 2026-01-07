@@ -26,14 +26,6 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".SessionListActivity"
-            android:exported="false" />
-
-        <activity
-            android:name=".CreateSessionActivity"
-            android:exported="false" />
-
         <service
             android:name=".OverlayService"
             android:exported="false" />
