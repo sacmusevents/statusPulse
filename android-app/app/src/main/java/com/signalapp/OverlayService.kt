@@ -35,7 +35,8 @@ class OverlayService : Service() {
     private var lastY = 0
     private var initialX = 0
     private var initialY = 0
-    private var resetTimer: android.os.Handler? = null
+    private var resetHandler: Handler? = null
+    private var resetRunnable: Runnable? = null
     private val RESET_TIME = 10 * 1000L // 10 seconds
     private var dragButton: Button? = null
 
@@ -169,19 +170,27 @@ class OverlayService : Service() {
 
                 SupabaseManager.updateSignal(currentSessionId!!, color, timestamp)
 
-                // Cancel existing timer
-                if (resetTimer != null) {
-                    Handler(Looper.getMainLooper()).removeCallbacksAndMessages(null)
-                    resetTimer = null
+                // Cancel existing timer callback
+                if (resetHandler != null && resetRunnable != null) {
+                    resetHandler!!.removeCallbacks(resetRunnable!!)
                 }
 
                 // Set auto-reset timer for red/yellow (not for green)
                 if (color != "green") {
-                    resetTimer = Handler(Looper.getMainLooper())
-                    resetTimer!!.postDelayed({
+                    // Create handler if it doesn't exist
+                    if (resetHandler == null) {
+                        resetHandler = Handler(Looper.getMainLooper())
+                    }
+
+                    // Create new runnable and post it
+                    resetRunnable = Runnable {
                         android.util.Log.d("OverlayService", "Auto-resetting to green after 10 seconds")
                         updateSignalColor("green")
-                    }, RESET_TIME)
+                    }
+                    resetHandler!!.postDelayed(resetRunnable!!, RESET_TIME)
+                } else {
+                    // Clear runnable when setting to green
+                    resetRunnable = null
                 }
             } catch (e: Exception) {
                 android.util.Log.e("OverlayService", "updateSignalColor error", e)
@@ -194,9 +203,10 @@ class OverlayService : Service() {
         serviceScope.cancel()
 
         // Cancel any pending reset
-        if (resetTimer != null) {
-            Handler(Looper.getMainLooper()).removeCallbacksAndMessages(null)
-            resetTimer = null
+        if (resetHandler != null && resetRunnable != null) {
+            resetHandler!!.removeCallbacks(resetRunnable!!)
+            resetHandler = null
+            resetRunnable = null
         }
 
         if (this::overlayView.isInitialized) {
