@@ -30,6 +30,9 @@
 
         .back-btn { position: absolute; top: 20px; left: 20px; padding: 10px 20px; background: #333; color: #fff; border: none; border-radius: 5px; cursor: pointer; }
         .back-btn:hover { background: #444; }
+
+        .status { position: absolute; top: 20px; right: 20px; padding: 8px 15px; background: #333; color: #0f0; border-radius: 4px; font-size: 12px; }
+        .status.disconnected { color: #f00; }
     </style>
 </head>
 <body>
@@ -41,6 +44,7 @@
 
     <div class="screen" id="lightDisplay">
         <button class="back-btn" onclick="goBack()">← Back</button>
+        <div class="status" id="realtimeStatus">Connecting...</div>
         <div class="title" id="sessionTitle"></div>
         <div class="lights">
             <div class="light" id="redLight"></div>
@@ -55,45 +59,98 @@
         const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let currentSessionId = null;
-        let pollInterval = null;
+        let signalChannel = null;
 
         async function showSessions() {
-            const { data } = await db.from('sessions').select('*').eq('status', 'active');
-            const list = document.getElementById('sessionList');
-            const noSessions = document.getElementById('noSessions');
+            try {
+                const { data } = await db.from('sessions').select('*').eq('status', 'active');
+                const list = document.getElementById('sessionList');
+                const noSessions = document.getElementById('noSessions');
 
-            list.innerHTML = '';
-            if (!data || data.length === 0) {
-                noSessions.style.display = 'block';
-                return;
+                list.innerHTML = '';
+                if (!data || data.length === 0) {
+                    noSessions.style.display = 'block';
+                    return;
+                }
+
+                noSessions.style.display = 'none';
+                data.forEach(session => {
+                    const div = document.createElement('div');
+                    div.className = 'session-item';
+                    div.textContent = session.title;
+                    div.onclick = () => selectSession(session.id, session.title);
+                    list.appendChild(div);
+                });
+            } catch (err) {
+                console.error('Error loading sessions:', err);
             }
-
-            noSessions.style.display = 'none';
-            data.forEach(session => {
-                const div = document.createElement('div');
-                div.className = 'session-item';
-                div.textContent = session.title;
-                div.onclick = () => selectSession(session.id, session.title);
-                list.appendChild(div);
-            });
         }
 
-        function selectSession(sessionId, title) {
+        async function selectSession(sessionId, title) {
             currentSessionId = sessionId;
             document.getElementById('sessionTitle').textContent = title;
             document.getElementById('sessionSelect').classList.remove('active');
             document.getElementById('lightDisplay').classList.add('active');
 
-            clearInterval(pollInterval);
-            checkSignal();
-            pollInterval = setInterval(checkSignal, 3000);
+            updateRealtimeStatus('Connecting...');
+
+            // Fetch initial state
+            await checkSignal();
+
+            // Subscribe to realtime changes
+            subscribeToSignalChanges();
         }
 
         async function checkSignal() {
-            const { data } = await db.from('signals').select('color').eq('session_id', currentSessionId).single();
-            if (data) {
-                updateLights(data.color);
+            try {
+                const { data } = await db.from('signals').select('color').eq('session_id', currentSessionId).single();
+                if (data) {
+                    updateLights(data.color);
+                }
+            } catch (err) {
+                console.error('Error fetching signal:', err);
             }
+        }
+
+        function subscribeToSignalChanges() {
+            // Unsubscribe from previous channel if it exists
+            if (signalChannel) {
+                signalChannel.unsubscribe();
+            }
+
+            // Create new subscription
+            signalChannel = db.channel(`signals-${currentSessionId}`)
+                .on(
+                    'postgres_changes',
+                    {
+                        event: '*',
+                        schema: 'public',
+                        table: 'signals',
+                        filter: `session_id=eq.${currentSessionId}`
+                    },
+                    (payload) => {
+                        console.log('Signal change:', payload);
+                        if (payload.new && payload.new.color) {
+                            updateLights(payload.new.color);
+                        }
+                    }
+                )
+                .subscribe((status) => {
+                    console.log('Subscription status:', status);
+                    if (status === 'SUBSCRIBED') {
+                        updateRealtimeStatus('Connected');
+                    } else if (status === 'CLOSED') {
+                        updateRealtimeStatus('Disconnected');
+                    } else if (status === 'CHANNEL_ERROR') {
+                        updateRealtimeStatus('Error');
+                    }
+                });
+        }
+
+        function updateRealtimeStatus(status) {
+            const el = document.getElementById('realtimeStatus');
+            el.textContent = status;
+            el.classList.toggle('disconnected', status !== 'Connected');
         }
 
         function updateLights(color) {
@@ -103,7 +160,12 @@
         }
 
         function goBack() {
-            clearInterval(pollInterval);
+            // Unsubscribe from realtime
+            if (signalChannel) {
+                signalChannel.unsubscribe();
+                signalChannel = null;
+            }
+
             currentSessionId = null;
             document.getElementById('lightDisplay').classList.remove('active');
             document.getElementById('sessionSelect').classList.add('active');
