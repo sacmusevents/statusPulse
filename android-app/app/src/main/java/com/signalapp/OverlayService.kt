@@ -25,8 +25,8 @@ import java.time.format.DateTimeFormatter
 
 class OverlayService : Service() {
     private lateinit var windowManager: WindowManager
-    private lateinit var overlayView: View
-    private lateinit var layoutParams: WindowManager.LayoutParams
+    private val overlayViews = mutableListOf<View>()
+    private val layoutParamsList = mutableListOf<WindowManager.LayoutParams>()
     private var currentSessionId: String? = null
     private var currentSessionTitle: String? = null
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
@@ -38,7 +38,6 @@ class OverlayService : Service() {
     private var resetHandler: Handler? = null
     private var resetRunnable: Runnable? = null
     private val RESET_TIME = 10 * 1000L // 10 seconds
-    private var dragButton: Button? = null
 
     companion object {
         private var instance: OverlayService? = null
@@ -73,58 +72,62 @@ class OverlayService : Service() {
 
     private fun setupOverlay() {
         windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
-        overlayView = LayoutInflater.from(this).inflate(R.layout.overlay_layout, null)
 
-        val titleView: TextView = overlayView.findViewById(R.id.sessionTitle)
-        // Truncate session name to 20 chars max with ellipsis
-        val displayTitle = if (currentSessionTitle != null && currentSessionTitle!!.length > 20) {
-            currentSessionTitle!!.substring(0, 17) + "..."
-        } else {
-            currentSessionTitle
-        }
-        titleView.text = displayTitle
-
-        // Setup close button
-        val closeButton: Button = overlayView.findViewById(R.id.close_button)
-        closeButton.setOnClickListener {
-            stopSelf()
-        }
-
-        layoutParams = WindowManager.LayoutParams(
-            340,
-            380,
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
-            else
-                @Suppress("DEPRECATION")
-                WindowManager.LayoutParams.TYPE_PHONE,
-            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-            PixelFormat.TRANSPARENT
+        // Create 4 test overlays in each corner with different heights
+        val testConfigs = listOf(
+            Triple(Gravity.TOP or Gravity.START, 48, 20 to 20),      // Top-left: 48dp
+            Triple(Gravity.TOP or Gravity.END, 44, 20 to 20),         // Top-right: 44dp
+            Triple(Gravity.BOTTOM or Gravity.START, 40, 20 to 20),   // Bottom-left: 40dp
+            Triple(Gravity.BOTTOM or Gravity.END, 36, 20 to 20)      // Bottom-right: 36dp
         )
 
-        layoutParams.gravity = Gravity.TOP or Gravity.END
-        layoutParams.x = 20
-        layoutParams.y = 20
-        layoutParams.alpha = 0.7f
+        for ((gravity, height, offsets) in testConfigs) {
+            val view = LayoutInflater.from(this).inflate(R.layout.overlay_layout, null)
 
-        windowManager.addView(overlayView, layoutParams)
-        setupButtonListeners()
-        setupTouchListener()
+            val closeButton: Button = view.findViewById(R.id.close_button)
+            closeButton.setOnClickListener {
+                stopSelf()
+            }
+
+            val params = WindowManager.LayoutParams(
+                280,
+                height,
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                    WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
+                else
+                    @Suppress("DEPRECATION")
+                    WindowManager.LayoutParams.TYPE_PHONE,
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                PixelFormat.TRANSPARENT
+            )
+
+            params.gravity = gravity
+            params.x = offsets.first
+            params.y = offsets.second
+            params.alpha = 0.7f
+
+            overlayViews.add(view)
+            layoutParamsList.add(params)
+            windowManager.addView(view, params)
+
+            setupButtonListenersForView(view)
+            setupTouchListenerForView(view, view.findViewById(R.id.drag_button), params)
+        }
     }
 
-    private fun setupTouchListener() {
+    private fun setupTouchListenerForView(view: View, dragBtn: Button, params: WindowManager.LayoutParams) {
         val handler = Handler(Looper.getMainLooper())
         val longPressRunnable = Runnable {
             isMoving = true
         }
 
-        dragButton?.setOnTouchListener { _, event ->
+        dragBtn.setOnTouchListener { _, event ->
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     lastX = event.rawX.toInt()
                     lastY = event.rawY.toInt()
-                    initialX = layoutParams.x
-                    initialY = layoutParams.y
+                    initialX = params.x
+                    initialY = params.y
                     handler.postDelayed(longPressRunnable, 500) // 500ms long press
                     true
                 }
@@ -133,10 +136,10 @@ class OverlayService : Service() {
                         val deltaX = event.rawX.toInt() - lastX
                         val deltaY = event.rawY.toInt() - lastY
 
-                        layoutParams.x = initialX + deltaX
-                        layoutParams.y = initialY + deltaY
+                        params.x = initialX + deltaX
+                        params.y = initialY + deltaY
 
-                        windowManager.updateViewLayout(overlayView, layoutParams)
+                        windowManager.updateViewLayout(view, params)
                     }
                     true
                 }
@@ -150,11 +153,10 @@ class OverlayService : Service() {
         }
     }
 
-    private fun setupButtonListeners() {
-        val redButton: Button = overlayView.findViewById(R.id.red_button)
-        val yellowButton: Button = overlayView.findViewById(R.id.yellow_button)
-        val greenButton: Button = overlayView.findViewById(R.id.green_button)
-        dragButton = overlayView.findViewById(R.id.drag_button)
+    private fun setupButtonListenersForView(view: View) {
+        val redButton: Button = view.findViewById(R.id.red_button)
+        val yellowButton: Button = view.findViewById(R.id.yellow_button)
+        val greenButton: Button = view.findViewById(R.id.green_button)
 
         redButton.setOnClickListener { updateSignalColor("red") }
         yellowButton.setOnClickListener { updateSignalColor("yellow") }
@@ -209,8 +211,11 @@ class OverlayService : Service() {
             resetRunnable = null
         }
 
-        if (this::overlayView.isInitialized) {
-            windowManager.removeView(overlayView)
+        // Remove all overlay views
+        overlayViews.forEach { view ->
+            windowManager.removeView(view)
         }
+        overlayViews.clear()
+        layoutParamsList.clear()
     }
 }
