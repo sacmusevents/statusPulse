@@ -13,13 +13,14 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:text="✕"
-        android:textSize="14sp"
-        android:textColor="#b0bec5"
-        android:background="@drawable/overlay_close_button"
+        android:textSize="18sp"
+        android:textColor="#ff6b6b"
+        android:background="@null"
         android:padding="0dp"
         android:minWidth="0dp"
         android:minHeight="0dp"
-        android:layout_marginEnd="2dp" />
+        android:layout_margin="1dp"
+        android:stateListAnimator="@null" />
 
     <!-- Drag button -->
     <Button
@@ -27,13 +28,14 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:text="⋮"
-        android:textSize="14sp"
-        android:textColor="#b0bec5"
-        android:background="@drawable/overlay_close_button"
+        android:textSize="18sp"
+        android:textColor="#ffeb3b"
+        android:background="@null"
         android:padding="0dp"
         android:minWidth="0dp"
         android:minHeight="0dp"
-        android:layout_marginEnd="4dp" />
+        android:layout_margin="1dp"
+        android:stateListAnimator="@null" />
 
     <!-- Red button -->
     <Button

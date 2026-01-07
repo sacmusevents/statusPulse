@@ -2,6 +2,13 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'org.jetbrains.kotlin.plugin.serialization'
 
+// Load local properties
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localProperties.load(localPropertiesFile.newDataInputStream())
+}
+
 android {
     namespace "com.signalapp"
     compileSdk 34
@@ -12,6 +19,10 @@ android {
         targetSdk 34
         versionCode 1
         versionName "1.0"
+
+        // Build config fields from local.properties
+        buildConfigField "String", "SUPABASE_URL", "\"${localProperties.getProperty('supabase.url', '')}\""
+        buildConfigField "String", "SUPABASE_KEY", "\"${localProperties.getProperty('supabase.key', '')}\""
     }
 
     buildTypes {
@@ -31,6 +42,7 @@ android {
 
     buildFeatures {
         viewBinding true
+        buildConfig true
     }
 }
 

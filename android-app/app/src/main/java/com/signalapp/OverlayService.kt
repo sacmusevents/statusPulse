@@ -73,46 +73,37 @@ class OverlayService : Service() {
     private fun setupOverlay() {
         windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
 
-        // Create 4 test overlays in each corner with different heights
-        val testConfigs = listOf(
-            Triple(Gravity.TOP or Gravity.START, 48, 20 to 20),      // Top-left: 48dp
-            Triple(Gravity.TOP or Gravity.END, 44, 20 to 20),         // Top-right: 44dp
-            Triple(Gravity.BOTTOM or Gravity.START, 40, 20 to 20),   // Bottom-left: 40dp
-            Triple(Gravity.BOTTOM or Gravity.END, 36, 20 to 20)      // Bottom-right: 36dp
+        // Create single overlay in top-left corner with 48dp height
+        val view = LayoutInflater.from(this).inflate(R.layout.overlay_layout, null)
+
+        val closeButton: Button = view.findViewById(R.id.close_button)
+        closeButton.setOnClickListener {
+            stopSelf()
+        }
+
+        val params = WindowManager.LayoutParams(
+            400,
+            48,
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
+            else
+                @Suppress("DEPRECATION")
+                WindowManager.LayoutParams.TYPE_PHONE,
+            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+            PixelFormat.TRANSPARENT
         )
 
-        for ((gravity, height, offsets) in testConfigs) {
-            val view = LayoutInflater.from(this).inflate(R.layout.overlay_layout, null)
+        params.gravity = Gravity.TOP or Gravity.START
+        params.x = 20
+        params.y = 20
+        params.alpha = 0.7f
 
-            val closeButton: Button = view.findViewById(R.id.close_button)
-            closeButton.setOnClickListener {
-                stopSelf()
-            }
+        overlayViews.add(view)
+        layoutParamsList.add(params)
+        windowManager.addView(view, params)
 
-            val params = WindowManager.LayoutParams(
-                400,
-                height,
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                    WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
-                else
-                    @Suppress("DEPRECATION")
-                    WindowManager.LayoutParams.TYPE_PHONE,
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-                PixelFormat.TRANSPARENT
-            )
-
-            params.gravity = gravity
-            params.x = offsets.first
-            params.y = offsets.second
-            params.alpha = 0.7f
-
-            overlayViews.add(view)
-            layoutParamsList.add(params)
-            windowManager.addView(view, params)
-
-            setupButtonListenersForView(view)
-            setupTouchListenerForView(view, view.findViewById(R.id.drag_button), params)
-        }
+        setupButtonListenersForView(view)
+        setupTouchListenerForView(view, view.findViewById(R.id.drag_button), params)
     }
 
     private fun setupTouchListenerForView(view: View, dragBtn: Button, params: WindowManager.LayoutParams) {
