@@ -55,7 +55,7 @@
         const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let currentSessionId = null;
-        let pollInterval = null;
+        let signalChannel = null;
 
         async function showSessions() {
             const { data } = await db.from('sessions').select('*').eq('status', 'active');
@@ -78,22 +78,38 @@
             });
         }
 
-        function selectSession(sessionId, title) {
+        async function selectSession(sessionId, title) {
             currentSessionId = sessionId;
             document.getElementById('sessionTitle').textContent = title;
             document.getElementById('sessionSelect').classList.remove('active');
             document.getElementById('lightDisplay').classList.add('active');
 
-            clearInterval(pollInterval);
-            checkSignal();
-            pollInterval = setInterval(checkSignal, 3000);
+            if (signalChannel) {
+                signalChannel.unsubscribe();
+            }
+
+            await loadInitialSignal();
+            subscribeToSignalChanges();
         }
 
-        async function checkSignal() {
+        async function loadInitialSignal() {
             const { data } = await db.from('signals').select('color').eq('session_id', currentSessionId).single();
             if (data) {
                 updateLights(data.color);
             }
+        }
+
+        function subscribeToSignalChanges() {
+            signalChannel = db.channel(`signals-${currentSessionId}`)
+                .on('postgres_changes', {
+                    event: 'UPDATE',
+                    schema: 'public',
+                    table: 'signals',
+                    filter: `session_id=eq.${currentSessionId}`
+                }, (payload) => {
+                    updateLights(payload.new.color);
+                })
+                .subscribe();
         }
 
         function updateLights(color) {
@@ -103,7 +119,10 @@
         }
 
         function goBack() {
-            clearInterval(pollInterval);
+            if (signalChannel) {
+                signalChannel.unsubscribe();
+                signalChannel = null;
+            }
             currentSessionId = null;
             document.getElementById('lightDisplay').classList.remove('active');
             document.getElementById('sessionSelect').classList.add('active');
