@@ -179,7 +179,6 @@
 
         .light.red {
             background-color: #ff0000;
-            opacity: 0.3;
         }
 
         .light.red.active {
@@ -189,7 +188,6 @@
 
         .light.yellow {
             background-color: #ffff00;
-            opacity: 0.3;
         }
 
         .light.yellow.active {
@@ -199,12 +197,15 @@
 
         .light.green {
             background-color: #00ff00;
-            opacity: 0.3;
         }
 
         .light.green.active {
             opacity: 1;
             box-shadow: 0 0 50px rgba(0, 255, 0, 0.8), inset 0 0 20px rgba(0, 255, 0, 0.4);
+        }
+
+        .light.inactive {
+            opacity: 0.3;
         }
 
         .footer {
@@ -332,9 +333,29 @@
         }
 
         function updateLights(color) {
-            document.getElementById('redLight').classList.toggle('red', color === 'red');
-            document.getElementById('yellowLight').classList.toggle('yellow', color === 'yellow');
-            document.getElementById('greenLight').classList.toggle('green', color === 'green');
+            const redLight = document.getElementById('redLight');
+            const yellowLight = document.getElementById('yellowLight');
+            const greenLight = document.getElementById('greenLight');
+
+            // Reset all lights
+            [redLight, yellowLight, greenLight].forEach(light => {
+                light.classList.remove('red', 'yellow', 'green', 'active', 'inactive');
+            });
+
+            // Set active light
+            if (color === 'red') {
+                redLight.classList.add('red', 'active');
+                yellowLight.classList.add('yellow', 'inactive');
+                greenLight.classList.add('green', 'inactive');
+            } else if (color === 'yellow') {
+                redLight.classList.add('red', 'inactive');
+                yellowLight.classList.add('yellow', 'active');
+                greenLight.classList.add('green', 'inactive');
+            } else if (color === 'green') {
+                redLight.classList.add('red', 'inactive');
+                yellowLight.classList.add('yellow', 'inactive');
+                greenLight.classList.add('green', 'active');
+            }
         }
 
         function goBack() {
