@@ -3,176 +3,479 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Signal Lights</title>
+    <title>Signal Lights Display</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%231a237e' width='100' height='100' rx='12'/><circle cx='50' cy='25' r='15' fill='%23ff6b6b'/><circle cx='50' cy='50' r='15' fill='%23ffeb3b'/><circle cx='50' cy='75' r='15' fill='%234caf50'/></svg>">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { width: 100vw; height: 100vh; background: #000; font-family: sans-serif; overflow: hidden; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-        .screen { display: none; width: 100%; height: 100%; justify-content: center; align-items: center; flex-direction: column; }
-        .screen.active { display: flex; }
+        body {
+            width: 100%;
+            height: 100vh;
+            background-color: #000000;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            overflow: hidden;
+        }
 
-        /* Session Selection */
-        #sessionSelect { background: #1a1a1a; }
-        .session-list { display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 500px; }
-        .session-item { background: #2a2a2a; color: #fff; padding: 15px; border-radius: 8px; cursor: pointer; text-align: center; border: 1px solid #444; }
-        .session-item:hover { background: #3a3a3a; border-color: #0f0; }
-        .no-sessions { color: #888; }
+        .container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
 
-        /* Light Display */
-        #lightDisplay { background: #000; flex-direction: column; gap: 40px; }
-        .title { color: #fff; font-size: 24px; margin-bottom: 20px; }
-        .lights { display: flex; gap: 30px; }
-        .light { width: 100px; height: 100px; border-radius: 50%; background: #222; transition: background 0.3s; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
-        .light.red { background: #ff4444; box-shadow: 0 0 30px #ff0000; }
-        .light.yellow { background: #ffff00; box-shadow: 0 0 30px #ffff00; }
-        .light.green { background: #00ff00; box-shadow: 0 0 30px #00ff00; }
+        /* ============================================
+           SESSION SELECTION SCREEN
+           ============================================ */
+        .screen {
+            display: none;
+            width: 100%;
+            height: 100%;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            padding: 40px;
+        }
 
-        .back-btn { position: absolute; top: 20px; left: 20px; padding: 10px 20px; background: #333; color: #fff; border: none; border-radius: 5px; cursor: pointer; }
-        .back-btn:hover { background: #444; }
+        .screen.active {
+            display: flex;
+        }
 
-        .status { position: absolute; top: 20px; right: 20px; padding: 8px 15px; background: #333; color: #0f0; border-radius: 4px; font-size: 12px; }
-        .status.disconnected { color: #f00; }
+        #sessionSelectScreen {
+            background-color: #000000;
+        }
+
+        .session-title {
+            color: #00ff00;
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .session-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .session-item {
+            background-color: #1a1a1a;
+            border: 2px solid #333333;
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .session-item:hover {
+            background-color: #2a2a2a;
+            border-color: #00ff00;
+            transform: translateY(-5px);
+        }
+
+        .session-item-title {
+            color: #ffffff;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .session-item-info {
+            color: #888888;
+            font-size: 12px;
+        }
+
+        .no-sessions {
+            color: #888888;
+            font-size: 18px;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .status {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+            font-family: 'Courier New', monospace;
+        }
+
+        .status.connected {
+            color: rgba(0, 255, 0, 0.7);
+        }
+
+        .status.disconnected {
+            color: rgba(255, 100, 100, 0.7);
+        }
+
+        /* ============================================
+           LIGHT DISPLAY SCREEN
+           ============================================ */
+        #lightDisplayScreen {
+            background-color: #000000;
+            justify-content: space-around;
+            flex-direction: column;
+        }
+
+        .header {
+            text-align: center;
+            color: #00ff00;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .back-btn {
+            background-color: #333333;
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background-color: #555555;
+        }
+
+        .lights-container {
+            display: flex;
+            gap: 60px;
+            justify-content: center;
+            align-items: center;
+            flex: 1;
+        }
+
+        .light {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
+            font-weight: bold;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .light.red {
+            background-color: #ff0000;
+            opacity: 0.3;
+        }
+
+        .light.red.active {
+            opacity: 1;
+            box-shadow: 0 0 50px rgba(255, 0, 0, 0.8), inset 0 0 20px rgba(255, 0, 0, 0.4);
+        }
+
+        .light.yellow {
+            background-color: #ffff00;
+            opacity: 0.3;
+        }
+
+        .light.yellow.active {
+            opacity: 1;
+            box-shadow: 0 0 50px rgba(255, 255, 0, 0.8), inset 0 0 20px rgba(255, 255, 0, 0.4);
+            color: rgba(0, 0, 0, 0.7);
+        }
+
+        .light.green {
+            background-color: #00ff00;
+            opacity: 0.3;
+        }
+
+        .light.green.active {
+            opacity: 1;
+            box-shadow: 0 0 50px rgba(0, 255, 0, 0.8), inset 0 0 20px rgba(0, 255, 0, 0.4);
+            color: rgba(0, 0, 0, 0.7);
+        }
+
+        .footer {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 12px;
+            padding: 20px;
+        }
     </style>
 </head>
 <body>
-    <div class="screen active" id="sessionSelect">
-        <h1 style="color: #fff; margin-bottom: 30px;">Select Session</h1>
-        <div class="session-list" id="sessionList"></div>
-        <div class="no-sessions" id="noSessions">No active sessions</div>
-    </div>
+    <div class="container">
+        <!-- Session Selection Screen -->
+        <div class="screen active" id="sessionSelectScreen">
+            <div class="session-title">Select Session</div>
+            <div class="session-list" id="sessionList">
+                <div class="no-sessions">Loading sessions...</div>
+            </div>
 
-    <div class="screen" id="lightDisplay">
-        <button class="back-btn" onclick="goBack()">← Back</button>
-        <div class="status" id="realtimeStatus">Connecting...</div>
-        <div class="title" id="sessionTitle"></div>
-        <div class="lights">
-            <div class="light" id="redLight"></div>
-            <div class="light" id="yellowLight"></div>
-            <div class="light" id="greenLight"></div>
+            <div class="status disconnected" id="status">Connecting...</div>
+        </div>
+
+        <!-- Light Display Screen -->
+        <div class="screen" id="lightDisplayScreen">
+            <div class="header">
+                <button class="back-btn" onclick="goBackToSessions()">← Back</button>
+                <div id="sessionName">Session Name</div>
+                <div style="width: 120px;"></div>
+            </div>
+            <div class="lights-container">
+                <div class="light red" id="light-red">RED</div>
+                <div class="light yellow" id="light-yellow">YELLOW</div>
+                <div class="light green active" id="light-green">GREEN</div>
+            </div>
+            <div class="footer">
+                <div id="footer-info">Connected to session</div>
+                <div id="realtime-status" style="margin-top: 10px; font-size: 11px; color: #888;">Realtime: Connecting...</div>
+            </div>
         </div>
     </div>
 
     <script>
+        // ============================================
+        // SUPABASE CONFIGURATION
+        // ============================================
         const SUPABASE_URL = 'https://pgipjbsekpwzrjxjytxv.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_9sD73_OSr4EgV9UFslJykA_bRBS5Kgr';
-        const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+        let db = null;
         let currentSessionId = null;
         let signalChannel = null;
 
-        async function showSessions() {
-            try {
-                const { data } = await db.from('sessions').select('*').eq('status', 'active');
-                const list = document.getElementById('sessionList');
-                const noSessions = document.getElementById('noSessions');
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        async function initSupabase() {
+            if (SUPABASE_URL === 'YOUR_SUPABASE_URL_HERE' || SUPABASE_KEY === 'YOUR_SUPABASE_KEY_HERE') {
+                showError('Please configure Supabase credentials');
+                return;
+            }
 
-                list.innerHTML = '';
-                if (!data || data.length === 0) {
-                    noSessions.style.display = 'block';
-                    return;
+            db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            updateConnectionStatus(true);
+
+            // Load sessions on start
+            await loadSessions();
+
+            // Check if session ID is in URL and auto-select it
+            const params = new URLSearchParams(window.location.search);
+            const sessionIdFromUrl = params.get('session');
+            if (sessionIdFromUrl) {
+                const session = document.querySelector(`[data-session-id="${sessionIdFromUrl}"]`);
+                if (session) {
+                    session.click();
                 }
-
-                noSessions.style.display = 'none';
-                data.forEach(session => {
-                    const div = document.createElement('div');
-                    div.className = 'session-item';
-                    div.textContent = session.title;
-                    div.onclick = () => selectSession(session.id, session.title);
-                    list.appendChild(div);
-                });
-            } catch (err) {
-                console.error('Error loading sessions:', err);
             }
         }
 
-        async function selectSession(sessionId, title) {
+        // ============================================
+        // SESSION MANAGEMENT
+        // ============================================
+        async function loadSessions() {
+            try {
+                const { data: sessions, error } = await db
+                    .from('sessions')
+                    .select('*')
+                    .eq('status', 'active')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                displaySessions(sessions || []);
+            } catch (error) {
+                console.error('Error loading sessions:', error);
+                showError('Failed to load sessions');
+            }
+        }
+
+        function displaySessions(sessions) {
+            const sessionList = document.getElementById('sessionList');
+
+            if (sessions.length === 0) {
+                sessionList.innerHTML = '<div class="no-sessions">No active sessions. Create one from Android!</div>';
+                return;
+            }
+
+            sessionList.innerHTML = sessions.map(session => `
+                <div class="session-item" data-session-id="${session.id}" onclick="selectSession('${session.id}', '${session.title}')">
+                    <div class="session-item-title">${escapeHtml(session.title)}</div>
+                    <div class="session-item-info">Created: ${new Date(session.created_at).toLocaleString()}</div>
+                </div>
+            `).join('');
+        }
+
+        async function selectSession(sessionId, sessionTitle) {
             currentSessionId = sessionId;
-            document.getElementById('sessionTitle').textContent = title;
-            document.getElementById('sessionSelect').classList.remove('active');
-            document.getElementById('lightDisplay').classList.add('active');
+            console.log(`Session selected: ${sessionTitle} (${sessionId})`);
 
-            updateRealtimeStatus('Connecting...');
+            // Show light display screen
+            document.getElementById('sessionSelectScreen').classList.remove('active');
+            document.getElementById('lightDisplayScreen').classList.add('active');
+            document.getElementById('sessionName').textContent = escapeHtml(sessionTitle);
 
-            // Fetch initial state
-            await checkSignal();
+            // Start with green
+            setLight('green');
 
-            // Subscribe to realtime changes
+            // Fetch initial state and subscribe to changes
+            await loadSignalState();
             subscribeToSignalChanges();
         }
 
-        async function checkSignal() {
-            try {
-                const { data } = await db.from('signals').select('color').eq('session_id', currentSessionId).single();
-                if (data) {
-                    updateLights(data.color);
-                }
-            } catch (err) {
-                console.error('Error fetching signal:', err);
-            }
-        }
+        function goBackToSessions() {
+            currentSessionId = null;
 
-        function subscribeToSignalChanges() {
-            // Unsubscribe from previous channel if it exists
-            if (signalChannel) {
-                signalChannel.unsubscribe();
-            }
-
-            // Create new subscription
-            signalChannel = db.channel(`signals-${currentSessionId}`)
-                .on(
-                    'postgres_changes',
-                    {
-                        event: '*',
-                        schema: 'public',
-                        table: 'signals',
-                        filter: `session_id=eq.${currentSessionId}`
-                    },
-                    (payload) => {
-                        console.log('Signal change:', payload);
-                        if (payload.new && payload.new.color) {
-                            updateLights(payload.new.color);
-                        }
-                    }
-                )
-                .subscribe((status) => {
-                    console.log('Subscription status:', status);
-                    if (status === 'SUBSCRIBED') {
-                        updateRealtimeStatus('Connected');
-                    } else if (status === 'CLOSED') {
-                        updateRealtimeStatus('Disconnected');
-                    } else if (status === 'CHANNEL_ERROR') {
-                        updateRealtimeStatus('Error');
-                    }
-                });
-        }
-
-        function updateRealtimeStatus(status) {
-            const el = document.getElementById('realtimeStatus');
-            el.textContent = status;
-            el.classList.toggle('disconnected', status !== 'Connected');
-        }
-
-        function updateLights(color) {
-            document.getElementById('redLight').classList.toggle('red', color === 'red');
-            document.getElementById('yellowLight').classList.toggle('yellow', color === 'yellow');
-            document.getElementById('greenLight').classList.toggle('green', color === 'green');
-        }
-
-        function goBack() {
             // Unsubscribe from realtime
             if (signalChannel) {
                 signalChannel.unsubscribe();
                 signalChannel = null;
             }
 
-            currentSessionId = null;
-            document.getElementById('lightDisplay').classList.remove('active');
-            document.getElementById('sessionSelect').classList.add('active');
-            showSessions();
+            // Show session selection screen
+            document.getElementById('lightDisplayScreen').classList.remove('active');
+            document.getElementById('sessionSelectScreen').classList.add('active');
+
+            // Reload sessions
+            loadSessions();
         }
 
-        showSessions();
+        // ============================================
+        // SIGNAL STATE MANAGEMENT
+        // ============================================
+        async function loadSignalState() {
+            try {
+                const { data: signal, error } = await db
+                    .from('signals')
+                    .select('color')
+                    .eq('session_id', currentSessionId)
+                    .single();
+
+                if (error) throw error;
+
+                if (signal) {
+                    setLight(signal.color);
+                    console.log(`Initial signal loaded: ${signal.color}`);
+                }
+            } catch (error) {
+                console.error('Error loading signal state:', error);
+            }
+        }
+
+        function subscribeToSignalChanges() {
+            try {
+                console.log(`Subscribing to signals for session ${currentSessionId}`);
+
+                // Unsubscribe from previous channel if it exists
+                if (signalChannel) {
+                    signalChannel.unsubscribe();
+                }
+
+                // Create new subscription
+                signalChannel = db.channel(`signals-${currentSessionId}`)
+                    .on(
+                        'postgres_changes',
+                        {
+                            event: '*',
+                            schema: 'public',
+                            table: 'signals',
+                            filter: `session_id=eq.${currentSessionId}`
+                        },
+                        (payload) => {
+                            console.log('Signal change received:', payload);
+                            if (payload.new && payload.new.color) {
+                                setLight(payload.new.color);
+                            }
+                        }
+                    )
+                    .subscribe((status) => {
+                        console.log(`Subscription status: ${status}`);
+                        const statusEl = document.getElementById('realtime-status');
+                        if (statusEl) {
+                            if (status === 'SUBSCRIBED') {
+                                statusEl.textContent = '✓ Realtime: Connected';
+                                statusEl.style.color = '#4caf50';
+                                console.log('✓ Successfully subscribed to signals');
+                            } else if (status === 'CHANNEL_ERROR') {
+                                statusEl.textContent = '✗ Realtime: Channel Error';
+                                statusEl.style.color = '#ff6b6b';
+                                console.error('Channel error occurred');
+                            } else if (status === 'TIMED_OUT') {
+                                statusEl.textContent = '✗ Realtime: Timed Out (retrying...)';
+                                statusEl.style.color = '#ffeb3b';
+                                console.error('Subscription timed out - retrying...');
+                                setTimeout(subscribeToSignalChanges, 3000);
+                            } else {
+                                statusEl.textContent = `Realtime: ${status}`;
+                                statusEl.style.color = '#888';
+                            }
+                        }
+                    });
+            } catch (error) {
+                console.error('Error subscribing to signals:', error);
+            }
+        }
+
+        function setLight(color) {
+            // Remove active class from all lights
+            document.getElementById('light-red').classList.remove('active');
+            document.getElementById('light-yellow').classList.remove('active');
+            document.getElementById('light-green').classList.remove('active');
+
+            // Add active class to selected light
+            document.getElementById(`light-${color}`).classList.add('active');
+        }
+
+        // ============================================
+        // UI UTILITIES
+        // ============================================
+        function updateConnectionStatus(connected) {
+            const status = document.getElementById('status');
+            if (connected) {
+                status.textContent = 'Connected';
+                status.classList.add('connected');
+                status.classList.remove('disconnected');
+            } else {
+                status.textContent = 'Disconnected';
+                status.classList.remove('connected');
+                status.classList.add('disconnected');
+            }
+        }
+
+        function showError(message) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.classList.add('disconnected');
+            status.classList.remove('connected');
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ============================================
+        // START APP
+        // ============================================
+        window.addEventListener('DOMContentLoaded', () => {
+            initSupabase();
+        });
     </script>
 </body>
 </html>
