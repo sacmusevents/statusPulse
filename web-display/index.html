@@ -172,7 +172,7 @@
             box-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
             font-weight: bold;
             font-size: 14px;
-            color: rgba(255, 255, 255, 0.5);
+            color: transparent;
             text-transform: uppercase;
             letter-spacing: 2px;
         }
@@ -256,34 +256,46 @@
         let resetTimer = null;
 
         async function showSessions() {
-            const { data } = await db.from('sessions').select('*').eq('status', 'active');
-            const list = document.getElementById('sessionList');
-            const noSessions = document.getElementById('noSessions');
+            try {
+                const { data } = await db.from('sessions').select('*').eq('status', 'active');
+                const list = document.getElementById('sessionList');
+                const noSessions = document.getElementById('noSessions');
+                const status = document.getElementById('status');
 
-            // Remove only session items, not the noSessions element
-            const items = list.querySelectorAll('.session-item');
-            items.forEach(item => item.remove());
+                // Update status to connected
+                status.textContent = 'Connected';
+                status.className = 'status connected';
 
-            if (!data || data.length === 0) {
-                noSessions.style.display = 'block';
-                return;
+                // Remove only session items, not the noSessions element
+                const items = list.querySelectorAll('.session-item');
+                items.forEach(item => item.remove());
+
+                if (!data || data.length === 0) {
+                    noSessions.style.display = 'block';
+                    return;
+                }
+
+                noSessions.style.display = 'none';
+                data.forEach(session => {
+                    const div = document.createElement('div');
+                    div.className = 'session-item';
+                    const title = document.createElement('div');
+                    title.className = 'session-item-title';
+                    title.textContent = session.title;
+                    const info = document.createElement('div');
+                    info.className = 'session-item-info';
+                    info.textContent = `Created: ${new Date(session.created_at).toLocaleString()}`;
+                    div.appendChild(title);
+                    div.appendChild(info);
+                    div.onclick = () => selectSession(session.id, session.title);
+                    list.appendChild(div);
+                });
+            } catch (error) {
+                console.error('Error loading sessions:', error);
+                const status = document.getElementById('status');
+                status.textContent = 'Connection Failed';
+                status.className = 'status disconnected';
             }
-
-            noSessions.style.display = 'none';
-            data.forEach(session => {
-                const div = document.createElement('div');
-                div.className = 'session-item';
-                const title = document.createElement('div');
-                title.className = 'session-item-title';
-                title.textContent = session.title;
-                const info = document.createElement('div');
-                info.className = 'session-item-info';
-                info.textContent = `Created: ${new Date(session.created_at).toLocaleString()}`;
-                div.appendChild(title);
-                div.appendChild(info);
-                div.onclick = () => selectSession(session.id, session.title);
-                list.appendChild(div);
-            });
         }
 
         async function selectSession(sessionId, title) {
@@ -304,6 +316,23 @@
             const { data } = await db.from('signals').select('color').eq('session_id', currentSessionId).single();
             if (data) {
                 updateLights(data.color);
+                startTimer(data.color);
+            }
+        }
+
+        function startTimer(color) {
+            // Clear any existing timer
+            if (resetTimer) {
+                clearTimeout(resetTimer);
+                resetTimer = null;
+            }
+
+            // Start 10-second timer for red/yellow, stays indefinitely for green
+            if (color !== 'green') {
+                resetTimer = setTimeout(() => {
+                    updateLights('green');
+                    resetTimer = null;
+                }, 10000);
             }
         }
 
@@ -317,21 +346,7 @@
                 }, (payload) => {
                     const color = payload.new.color;
                     updateLights(color);
-
-                    // Reset any existing timer
-                    if (resetTimer) {
-                        clearTimeout(resetTimer);
-                    }
-
-                    // Start 10-second timer for red/yellow, stays indefinitely for green
-                    if (color !== 'green') {
-                        resetTimer = setTimeout(() => {
-                            updateLights('green');
-                            resetTimer = null;
-                        }, 10000);
-                    } else {
-                        resetTimer = null;
-                    }
+                    startTimer(color);
                 })
                 .subscribe();
         }
