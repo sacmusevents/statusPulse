@@ -26,6 +26,16 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".CreateSessionActivity"
+            android:exported="false"
+            android:theme="@style/Theme.SignalLights" />
+
+        <activity
+            android:name=".SessionListActivity"
+            android:exported="false"
+            android:theme="@style/Theme.SignalLights" />
+
         <service
             android:name=".OverlayService"
             android:exported="false" />

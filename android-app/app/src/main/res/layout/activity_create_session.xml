@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="30dp"
+    android:background="@drawable/gradient_background">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Create Session"
+        android:textSize="32sp"
+        android:textStyle="bold"
+        android:textColor="#00ff00"
+        android:layout_marginBottom="40dp" />
+
+    <EditText
+        android:id="@+id/sessionNameInput"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:hint="Session name"
+        android:textColorHint="#666666"
+        android:textColor="#ffffff"
+        android:background="@drawable/button_secondary"
+        android:paddingStart="15dp"
+        android:paddingEnd="15dp"
+        android:layout_marginBottom="20dp"
+        android:inputType="text" />
+
+    <Button
+        android:id="@+id/createBtn"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:text="Create"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:background="@drawable/button_primary"
+        android:textColor="#ffffff"
+        android:layout_marginBottom="12dp"
+        android:stateListAnimator="@null" />
+
+    <Button
+        android:id="@+id/cancelBtn"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:text="Cancel"
+        android:textSize="16sp"
+        android:background="@drawable/button_secondary"
+        android:textColor="#ffffff"
+        android:stateListAnimator="@null" />
+
+</LinearLayout>
