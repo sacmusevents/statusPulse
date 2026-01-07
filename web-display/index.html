@@ -249,17 +249,32 @@
     </div>
 
     <script>
+        // ============================================
+        // SUPABASE CONFIGURATION
+        // ============================================
         const SUPABASE_URL = 'https://pgipjbsekpwzrjxjytxv.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_9sD73_OSr4EgV9UFslJykA_bRBS5Kgr';
-        const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+        let db = null;
         let currentSessionId = null;
         let signalChannel = null;
 
+        // ============================================
+        // INITIALIZATION
+        // ============================================
         async function initSupabase() {
+            if (SUPABASE_URL === 'YOUR_SUPABASE_URL_HERE' || SUPABASE_KEY === 'YOUR_SUPABASE_KEY_HERE') {
+                showError('Please configure Supabase credentials');
+                return;
+            }
+
+            db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
             updateConnectionStatus(true);
+
+            // Load sessions on start
             await loadSessions();
 
+            // Check if session ID is in URL and auto-select it
             const params = new URLSearchParams(window.location.search);
             const sessionIdFromUrl = params.get('session');
             if (sessionIdFromUrl) {
@@ -270,6 +285,9 @@
             }
         }
 
+        // ============================================
+        // SESSION MANAGEMENT
+        // ============================================
         async function loadSessions() {
             try {
                 const { data: sessions, error } = await db
@@ -279,6 +297,7 @@
                     .order('created_at', { ascending: false });
 
                 if (error) throw error;
+
                 displaySessions(sessions || []);
             } catch (error) {
                 console.error('Error loading sessions:', error);
@@ -306,12 +325,15 @@
             currentSessionId = sessionId;
             console.log(`Session selected: ${sessionTitle} (${sessionId})`);
 
+            // Show light display screen
             document.getElementById('sessionSelectScreen').classList.remove('active');
             document.getElementById('lightDisplayScreen').classList.add('active');
             document.getElementById('sessionName').textContent = escapeHtml(sessionTitle);
 
+            // Start with green
             setLight('green');
 
+            // Fetch initial state and subscribe to changes
             await loadSignalState();
             subscribeToSignalChanges();
         }
@@ -319,17 +341,23 @@
         function goBackToSessions() {
             currentSessionId = null;
 
+            // Unsubscribe from realtime
             if (signalChannel) {
                 signalChannel.unsubscribe();
                 signalChannel = null;
             }
 
+            // Show session selection screen
             document.getElementById('lightDisplayScreen').classList.remove('active');
             document.getElementById('sessionSelectScreen').classList.add('active');
 
+            // Reload sessions
             loadSessions();
         }
 
+        // ============================================
+        // SIGNAL STATE MANAGEMENT
+        // ============================================
         async function loadSignalState() {
             try {
                 const { data: signal, error } = await db
@@ -353,10 +381,12 @@
             try {
                 console.log(`Subscribing to signals for session ${currentSessionId}`);
 
+                // Unsubscribe from previous channel if it exists
                 if (signalChannel) {
                     signalChannel.unsubscribe();
                 }
 
+                // Create new subscription
                 signalChannel = db.channel(`signals-${currentSessionId}`)
                     .on(
                         'postgres_changes',
@@ -384,9 +414,11 @@
                             } else if (status === 'CHANNEL_ERROR') {
                                 statusEl.textContent = '✗ Realtime: Channel Error';
                                 statusEl.style.color = '#ff6b6b';
+                                console.error('Channel error occurred');
                             } else if (status === 'TIMED_OUT') {
                                 statusEl.textContent = '✗ Realtime: Timed Out (retrying...)';
                                 statusEl.style.color = '#ffeb3b';
+                                console.error('Subscription timed out - retrying...');
                                 setTimeout(subscribeToSignalChanges, 3000);
                             } else {
                                 statusEl.textContent = `Realtime: ${status}`;
@@ -400,13 +432,18 @@
         }
 
         function setLight(color) {
+            // Remove active class from all lights
             document.getElementById('light-red').classList.remove('active');
             document.getElementById('light-yellow').classList.remove('active');
             document.getElementById('light-green').classList.remove('active');
 
+            // Add active class to selected light
             document.getElementById(`light-${color}`).classList.add('active');
         }
 
+        // ============================================
+        // UI UTILITIES
+        // ============================================
         function updateConnectionStatus(connected) {
             const status = document.getElementById('status');
             if (connected) {
@@ -433,6 +470,9 @@
             return div.innerHTML;
         }
 
+        // ============================================
+        // START APP
+        // ============================================
         window.addEventListener('DOMContentLoaded', () => {
             initSupabase();
         });
