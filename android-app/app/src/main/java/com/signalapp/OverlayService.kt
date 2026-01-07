@@ -75,15 +75,6 @@ class OverlayService : Service() {
         windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
         overlayView = LayoutInflater.from(this).inflate(R.layout.overlay_layout, null)
 
-        val titleView: TextView = overlayView.findViewById(R.id.sessionTitle)
-        // Truncate session name to 20 chars max with ellipsis
-        val displayTitle = if (currentSessionTitle != null && currentSessionTitle!!.length > 20) {
-            currentSessionTitle!!.substring(0, 17) + "..."
-        } else {
-            currentSessionTitle
-        }
-        titleView.text = displayTitle
-
         // Setup close button
         val closeButton: Button = overlayView.findViewById(R.id.close_button)
         closeButton.setOnClickListener {
@@ -91,8 +82,8 @@ class OverlayService : Service() {
         }
 
         layoutParams = WindowManager.LayoutParams(
-            340,
-            380,
+            320,
+            60,
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                 WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
             else
