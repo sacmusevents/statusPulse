@@ -3,18 +3,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal"
-    android:gravity="center_vertical"
-    android:padding="4dp"
-    android:background="@drawable/overlay_elegant_bg">
+    android:gravity="center"
+    android:padding="8dp"
+    android:background="@drawable/overlay_elegant_bg"
+    android:baselineAligned="false">
 
     <!-- Close button -->
     <Button
         android:id="@+id/close_button"
-        android:layout_width="60dp"
-        android:layout_height="120dp"
+        android:layout_width="50dp"
+        android:layout_height="100dp"
         android:text="ˣ"
-        android:textSize="20sp"
-        android:textColor="#ff6b6b"
+        android:textSize="18sp"
+        android:textColor="#ff0000"
         android:background="@null"
         android:padding="0dp"
         android:minWidth="0dp"
@@ -25,11 +26,11 @@
     <!-- Drag button -->
     <Button
         android:id="@+id/drag_button"
-        android:layout_width="60dp"
-        android:layout_height="120dp"
+        android:layout_width="50dp"
+        android:layout_height="100dp"
         android:text="↕"
-        android:textSize="24sp"
-        android:textColor="#ffeb3b"
+        android:textSize="20sp"
+        android:textColor="#ffff00"
         android:background="@null"
         android:padding="0dp"
         android:minWidth="0dp"
@@ -41,11 +42,11 @@
     <Button
         android:id="@+id/red_button"
         android:layout_width="0dp"
-        android:layout_height="120dp"
+        android:layout_height="100dp"
         android:layout_weight="1"
         android:text="●"
-        android:textSize="48sp"
-        android:textColor="#ff6b6b"
+        android:textSize="60sp"
+        android:textColor="#ff0000"
         android:background="@null"
         android:layout_margin="6dp"
         android:stateListAnimator="@null" />
@@ -54,11 +55,11 @@
     <Button
         android:id="@+id/yellow_button"
         android:layout_width="0dp"
-        android:layout_height="120dp"
+        android:layout_height="100dp"
         android:layout_weight="1"
         android:text="●"
-        android:textSize="48sp"
-        android:textColor="#ffeb3b"
+        android:textSize="60sp"
+        android:textColor="#ffff00"
         android:background="@null"
         android:layout_margin="6dp"
         android:stateListAnimator="@null" />
@@ -67,11 +68,11 @@
     <Button
         android:id="@+id/green_button"
         android:layout_width="0dp"
-        android:layout_height="120dp"
+        android:layout_height="100dp"
         android:layout_weight="1"
         android:text="●"
-        android:textSize="48sp"
-        android:textColor="#4caf50"
+        android:textSize="60sp"
+        android:textColor="#00ff00"
         android:background="@null"
         android:layout_margin="6dp"
         android:stateListAnimator="@null" />
