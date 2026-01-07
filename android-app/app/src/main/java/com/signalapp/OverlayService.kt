@@ -82,7 +82,7 @@ class OverlayService : Service() {
         }
 
         layoutParams = WindowManager.LayoutParams(
-            420,
+            320,
             60,
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                 WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
