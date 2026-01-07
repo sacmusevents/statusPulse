@@ -168,7 +168,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            transition: opacity 0.3s ease, box-shadow 0.3s ease;
+            transition: box-shadow 0.3s ease;
             box-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
             font-weight: bold;
             font-size: 14px;
@@ -253,7 +253,6 @@
 
         let currentSessionId = null;
         let signalChannel = null;
-        let resetTimer = null;
 
         async function showSessions() {
             try {
@@ -316,23 +315,6 @@
             const { data } = await db.from('signals').select('color').eq('session_id', currentSessionId).single();
             if (data) {
                 updateLights(data.color);
-                startTimer(data.color);
-            }
-        }
-
-        function startTimer(color) {
-            // Clear any existing timer
-            if (resetTimer) {
-                clearTimeout(resetTimer);
-                resetTimer = null;
-            }
-
-            // Start 10-second timer for red/yellow, stays indefinitely for green
-            if (color !== 'green') {
-                resetTimer = setTimeout(() => {
-                    updateLights('green');
-                    resetTimer = null;
-                }, 10000);
             }
         }
 
@@ -344,9 +326,7 @@
                     table: 'signals',
                     filter: `session_id=eq.${currentSessionId}`
                 }, (payload) => {
-                    const color = payload.new.color;
-                    updateLights(color);
-                    startTimer(color);
+                    updateLights(payload.new.color);
                 })
                 .subscribe();
         }
@@ -361,10 +341,6 @@
             if (signalChannel) {
                 signalChannel.unsubscribe();
                 signalChannel = null;
-            }
-            if (resetTimer) {
-                clearTimeout(resetTimer);
-                resetTimer = null;
             }
             currentSessionId = null;
             document.getElementById('lightDisplay').classList.remove('active');
