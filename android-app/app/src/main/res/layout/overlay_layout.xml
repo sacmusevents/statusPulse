@@ -26,7 +26,7 @@
         android:id="@+id/drag_button"
         android:layout_width="36dp"
         android:layout_height="36dp"
-        android:text="≡"
+        android:text="⬍"
         android:textSize="18sp"
         android:textColor="#b0bec5"
         android:background="@drawable/overlay_close_button"
