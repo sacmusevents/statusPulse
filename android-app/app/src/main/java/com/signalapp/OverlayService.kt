@@ -98,13 +98,13 @@ class OverlayService : Service() {
                 @Suppress("DEPRECATION")
                 WindowManager.LayoutParams.TYPE_PHONE,
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-            PixelFormat.TRANSLUCENT
+            PixelFormat.TRANSPARENT
         )
 
         layoutParams.gravity = Gravity.TOP or Gravity.END
         layoutParams.x = 20
         layoutParams.y = 20
-        layoutParams.alpha = 1.0f
+        layoutParams.alpha = 0.7f
 
         windowManager.addView(overlayView, layoutParams)
         setupButtonListeners()
