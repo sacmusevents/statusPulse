@@ -195,7 +195,6 @@
         .light.yellow.active {
             opacity: 1;
             box-shadow: 0 0 50px rgba(255, 255, 0, 0.8), inset 0 0 20px rgba(255, 255, 0, 0.4);
-            color: rgba(0, 0, 0, 0.7);
         }
 
         .light.green {
@@ -206,7 +205,6 @@
         .light.green.active {
             opacity: 1;
             box-shadow: 0 0 50px rgba(0, 255, 0, 0.8), inset 0 0 20px rgba(0, 255, 0, 0.4);
-            color: rgba(0, 0, 0, 0.7);
         }
 
         .footer {
@@ -255,13 +253,17 @@
 
         let currentSessionId = null;
         let signalChannel = null;
+        let resetTimer = null;
 
         async function showSessions() {
             const { data } = await db.from('sessions').select('*').eq('status', 'active');
             const list = document.getElementById('sessionList');
             const noSessions = document.getElementById('noSessions');
 
-            list.innerHTML = '';
+            // Remove only session items, not the noSessions element
+            const items = list.querySelectorAll('.session-item');
+            items.forEach(item => item.remove());
+
             if (!data || data.length === 0) {
                 noSessions.style.display = 'block';
                 return;
@@ -313,7 +315,23 @@
                     table: 'signals',
                     filter: `session_id=eq.${currentSessionId}`
                 }, (payload) => {
-                    updateLights(payload.new.color);
+                    const color = payload.new.color;
+                    updateLights(color);
+
+                    // Reset any existing timer
+                    if (resetTimer) {
+                        clearTimeout(resetTimer);
+                    }
+
+                    // Start 10-second timer for red/yellow, stays indefinitely for green
+                    if (color !== 'green') {
+                        resetTimer = setTimeout(() => {
+                            updateLights('green');
+                            resetTimer = null;
+                        }, 10000);
+                    } else {
+                        resetTimer = null;
+                    }
                 })
                 .subscribe();
         }
@@ -328,6 +346,10 @@
             if (signalChannel) {
                 signalChannel.unsubscribe();
                 signalChannel = null;
+            }
+            if (resetTimer) {
+                clearTimeout(resetTimer);
+                resetTimer = null;
             }
             currentSessionId = null;
             document.getElementById('lightDisplay').classList.remove('active');
