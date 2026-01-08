@@ -418,7 +418,9 @@
 
         async function showSessions() {
             try {
-                const { data } = await db.from('sessions').select('id, title, updated_at').eq('status', 'active');
+                const { data } = await db.from('sessions')
+                    .select('id, title, signals(updated_at)')
+                    .eq('status', 'active');
                 const list = document.getElementById('sessionList');
                 const noSessions = document.getElementById('noSessions');
                 const status = document.getElementById('status');
@@ -445,7 +447,8 @@
                     title.textContent = session.title;
                     const info = document.createElement('div');
                     info.className = 'session-item-info';
-                    info.textContent = `Updated: ${formatRelativeTime(session.updated_at)}`;
+                    const signalUpdatedAt = session.signals && session.signals[0] ? session.signals[0].updated_at : null;
+                    info.textContent = `Updated: ${signalUpdatedAt ? formatRelativeTime(signalUpdatedAt) : 'never'}`;
                     div.appendChild(title);
                     div.appendChild(info);
                     div.onclick = () => selectSession(session.id, session.title);
