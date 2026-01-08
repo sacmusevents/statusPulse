@@ -90,8 +90,8 @@
             android:text="FIX"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:textColor="#ffffff"
-            android:background="@drawable/overlay_button_red"
+            android:textColor="#000000"
+            android:background="@drawable/control_button_fix"
             android:foreground="?attr/selectableItemBackground"
             android:stateListAnimator="@null" />
 
@@ -104,7 +104,7 @@
             android:textSize="18sp"
             android:textStyle="bold"
             android:textColor="#ffffff"
-            android:background="@drawable/overlay_button_yellow"
+            android:background="@drawable/control_button_warn"
             android:foreground="?attr/selectableItemBackground"
             android:stateListAnimator="@null" />
 
@@ -116,8 +116,8 @@
             android:text="CORRECT"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:textColor="#ffffff"
-            android:background="@drawable/overlay_button_green"
+            android:textColor="#000000"
+            android:background="@drawable/control_button_correct"
             android:foreground="?attr/selectableItemBackground"
             android:stateListAnimator="@null" />
 
