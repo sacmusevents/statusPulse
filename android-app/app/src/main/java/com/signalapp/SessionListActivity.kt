@@ -46,6 +46,9 @@ class SessionListActivity : AppCompatActivity() {
                             val btn = Button(this@SessionListActivity)
                             btn.text = session.title
                             btn.layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+                            btn.setBackgroundResource(R.drawable.session_button)
+                            btn.setTextColor(android.graphics.Color.parseColor("#00ff00"))
+                            btn.setPadding(16, 20, 16, 20)
                             btn.setOnClickListener { joinSession(session.id, session.title) }
                             row.addView(btn)
 
@@ -55,6 +58,9 @@ class SessionListActivity : AppCompatActivity() {
                                 LinearLayout.LayoutParams.WRAP_CONTENT,
                                 LinearLayout.LayoutParams.WRAP_CONTENT
                             ).apply { setMargins(8, 0, 0, 0) }
+                            deleteBtn.setBackgroundResource(R.drawable.session_delete_button)
+                            deleteBtn.setTextColor(android.graphics.Color.parseColor("#000000"))
+                            deleteBtn.setPadding(12, 12, 12, 12)
                             deleteBtn.setOnClickListener { deleteSession(session.id) { loadSessions(container) } }
                             row.addView(deleteBtn)
 
