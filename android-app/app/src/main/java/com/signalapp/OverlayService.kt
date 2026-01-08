@@ -20,7 +20,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
-import java.time.LocalDateTime
+import java.time.Instant
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 class OverlayService : Service() {
@@ -39,8 +41,20 @@ class OverlayService : Service() {
     private var resetRunnable: Runnable? = null
     private val RESET_TIME = 10 * 1000L // 10 seconds
 
+    private var healthCheckHandler: Handler? = null
+    private var healthCheckRunnable: Runnable? = null
+    private val HEALTH_CHECK_INTERVAL = 5 * 1000L // 5 seconds
+
+    private var retryCount = 0
+    private val MAX_RETRIES = 10 // ~30-60 seconds with exponential backoff
+    private var onTemporaryDisconnectCallback: (() -> Unit)? = null
+    private var onReconnectedCallback: (() -> Unit)? = null
+    private var isReconnecting = false
+
     companion object {
         private var instance: OverlayService? = null
+        private var onConnectionLostCallback: (() -> Unit)? = null
+        private var onPermanentDisconnectCallback: ((sessionId: String?, sessionTitle: String?) -> Unit)? = null
 
         fun stopExistingOverlay() {
             instance?.stopSelf()
@@ -53,6 +67,41 @@ class OverlayService : Service() {
 
         fun updateSignalColorGlobally(color: String) {
             instance?.updateSignalColor(color)
+        }
+
+        fun closeSessionGracefully() {
+            instance?.updateSignalColor("green")
+            Handler(Looper.getMainLooper()).postDelayed({
+                stopExistingOverlay()
+            }, 300)
+        }
+
+        fun setOnConnectionLostCallback(callback: (() -> Unit)?) {
+            onConnectionLostCallback = callback
+        }
+
+        fun onConnectionLost() {
+            onConnectionLostCallback?.invoke()
+        }
+
+        fun setOnTemporaryDisconnectCallback(callback: (() -> Unit)?) {
+            instance?.let {
+                it.onTemporaryDisconnectCallback = callback
+            }
+        }
+
+        fun setOnReconnectedCallback(callback: (() -> Unit)?) {
+            instance?.let {
+                it.onReconnectedCallback = callback
+            }
+        }
+
+        fun setOnPermanentDisconnectCallback(callback: ((String?, String?) -> Unit)?) {
+            onPermanentDisconnectCallback = callback
+        }
+
+        fun onPermanentDisconnect(sessionId: String?, sessionTitle: String?) {
+            onPermanentDisconnectCallback?.invoke(sessionId, sessionTitle)
         }
     }
 
@@ -86,7 +135,7 @@ class OverlayService : Service() {
 
         val closeButton: Button = view.findViewById(R.id.close_button)
         closeButton.setOnClickListener {
-            stopSelf()
+            closeSessionGracefully()
         }
 
         val params = WindowManager.LayoutParams(
@@ -112,6 +161,9 @@ class OverlayService : Service() {
 
         setupButtonListenersForView(view)
         setupTouchListenerForView(view, view.findViewById(R.id.drag_button), params)
+
+        // Start health check to monitor connection
+        startHealthCheck()
     }
 
     private fun setupTouchListenerForView(view: View, dragBtn: Button, params: WindowManager.LayoutParams) {
@@ -165,11 +217,15 @@ class OverlayService : Service() {
     fun updateSignalColor(color: String) {
         serviceScope.launch(Dispatchers.IO) {
             try {
-                val now = LocalDateTime.now()
+                // Use UTC time, not local time
+                val now = ZonedDateTime.now(ZoneId.of("UTC"))
                 val formatter = DateTimeFormatter.ISO_DATE_TIME
                 val timestamp = formatter.format(now)
 
                 SupabaseManager.updateSignal(currentSessionId!!, color, timestamp)
+
+                // Connection restored - reset retry count
+                resetRetryCount()
 
                 // Cancel existing timer callback
                 if (resetHandler != null && resetRunnable != null) {
@@ -195,13 +251,96 @@ class OverlayService : Service() {
                 }
             } catch (e: Exception) {
                 android.util.Log.e("OverlayService", "updateSignalColor error", e)
+                // User action failed - just notify, don't increment retry count
+                handleConnectionError(color, isAutoRetry = false)
             }
+        }
+    }
+
+    private fun handleConnectionError(color: String, isAutoRetry: Boolean = false) {
+        // Only user-triggered failures start reconnecting state
+        if (!isAutoRetry && !isReconnecting) {
+            isReconnecting = true
+            retryCount = 0 // Start counter for automatic retries
+            onTemporaryDisconnectCallback?.invoke()
+        }
+
+        // Don't retry user-triggered actions, let health check handle reconnection
+        if (!isAutoRetry) {
+            android.util.Log.d("OverlayService", "User action failed, waiting for health check to detect")
+            return
+        }
+
+        // Only automatic retries increment the counter
+        retryCount++
+
+        if (retryCount < MAX_RETRIES) {
+            // Calculate exponential backoff: 1s, 2s, 4s, 8s, etc.
+            val delayMs = (1000L * Math.pow(2.0, (retryCount - 1).toDouble())).toLong()
+            android.util.Log.d("OverlayService", "Auto-retry in ${delayMs}ms (attempt $retryCount/$MAX_RETRIES)")
+
+            Handler(Looper.getMainLooper()).postDelayed({
+                // Retry the health check
+                performHealthCheck()
+            }, delayMs)
+        } else {
+            // Max retries exceeded - permanent disconnect
+            android.util.Log.e("OverlayService", "Max retries exceeded, permanent disconnect")
+            onPermanentDisconnect(instance?.currentSessionId, instance?.currentSessionTitle)
+        }
+    }
+
+    private fun resetRetryCount() {
+        if (isReconnecting) {
+            // Was reconnecting, now restored - notify UI
+            onReconnectedCallback?.invoke()
+        }
+        isReconnecting = false
+        retryCount = 0
+    }
+
+    private fun startHealthCheck() {
+        if (healthCheckHandler == null) {
+            healthCheckHandler = Handler(Looper.getMainLooper())
+        }
+
+        healthCheckRunnable = Runnable {
+            performHealthCheck()
+        }
+        healthCheckHandler?.post(healthCheckRunnable!!)
+    }
+
+    private fun performHealthCheck() {
+        serviceScope.launch(Dispatchers.IO) {
+            try {
+                // Try to fetch the session to verify connection
+                if (currentSessionId != null) {
+                    SupabaseManager.getSessions()
+                }
+                // If successful, reset retry count and schedule next check
+                resetRetryCount()
+                healthCheckHandler?.postDelayed(healthCheckRunnable!!, HEALTH_CHECK_INTERVAL)
+            } catch (e: Exception) {
+                // Connection error - use exponential backoff retry
+                android.util.Log.e("OverlayService", "Health check failed: ${e.message}")
+                handleConnectionError("green", isAutoRetry = true) // Use green as dummy, auto-retry
+            }
+        }
+    }
+
+    private fun stopHealthCheck() {
+        if (healthCheckHandler != null && healthCheckRunnable != null) {
+            healthCheckHandler!!.removeCallbacks(healthCheckRunnable!!)
+            healthCheckHandler = null
+            healthCheckRunnable = null
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
         serviceScope.cancel()
+
+        stopHealthCheck()
 
         // Cancel any pending reset
         if (resetHandler != null && resetRunnable != null) {
