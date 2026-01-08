@@ -190,10 +190,10 @@
             filter: none;
         }
 
-        /* White state - yellow alert, white circle with white glow */
+        /* White state - yellow alert, blue circle with blue glow */
         .light.red.white {
             opacity: 1;
-            filter: drop-shadow(0 0 60px rgba(255, 255, 255, 1)) drop-shadow(0 0 120px rgba(255, 255, 255, 0.8)) drop-shadow(0 0 180px rgba(255, 255, 255, 0.5));
+            filter: drop-shadow(0 0 60px rgba(33, 150, 243, 1)) drop-shadow(0 0 120px rgba(33, 150, 243, 0.8)) drop-shadow(0 0 180px rgba(33, 150, 243, 0.5));
         }
 
         /* Alert state - red, red circle with no glow */
@@ -344,10 +344,10 @@
                 svgPath.setAttribute('fill', 'white');
                 svgPath.setAttribute('stroke', 'white');
             } else if (color === 'yellow') {
-                // White state - white circle with glow
+                // White state - blue circle with glow (information advisory)
                 redLight.classList.add('white');
-                svgPath.setAttribute('fill', 'white');
-                svgPath.setAttribute('stroke', 'white');
+                svgPath.setAttribute('fill', '#2196F3');
+                svgPath.setAttribute('stroke', '#2196F3');
             } else if (color === 'red') {
                 // Alert state - red circle with no glow
                 redLight.classList.add('alert');
