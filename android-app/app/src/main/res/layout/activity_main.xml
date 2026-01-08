@@ -41,7 +41,7 @@
             android:textSize="14sp"
             android:textStyle="bold"
             android:background="@drawable/button_primary"
-            android:textColor="#ffffff"
+            android:textColor="#000000"
             android:layout_marginBottom="30dp"
             android:stateListAnimator="@null" />
 
@@ -53,7 +53,7 @@
             android:textSize="16sp"
             android:textStyle="bold"
             android:background="@drawable/button_primary"
-            android:textColor="#ffffff"
+            android:textColor="#000000"
             android:layout_marginBottom="16dp"
             android:stateListAnimator="@null"
             android:elevation="4dp" />
@@ -66,7 +66,7 @@
             android:textSize="16sp"
             android:textStyle="bold"
             android:background="@drawable/button_secondary"
-            android:textColor="#ffffff"
+            android:textColor="#00ff00"
             android:stateListAnimator="@null"
             android:elevation="4dp" />
 
@@ -87,7 +87,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="RED"
+            android:text="FIX"
             android:textSize="18sp"
             android:textStyle="bold"
             android:textColor="#ffffff"
@@ -100,7 +100,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="YELLOW"
+            android:text="WARN"
             android:textSize="18sp"
             android:textStyle="bold"
             android:textColor="#ffffff"
@@ -113,7 +113,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="GREEN"
+            android:text="CORRECT"
             android:textSize="18sp"
             android:textStyle="bold"
             android:textColor="#ffffff"
