@@ -385,39 +385,53 @@
 
         function formatRelativeTime(dateString) {
             const now = new Date();
+            console.log('Raw input:', dateString);
             // Normalize timestamp format: replace space with 'T' and fix timezone offset format
             let normalizedDateString = dateString.replace(' ', 'T');
             // Convert +00 to +00:00 for proper ISO 8601 parsing
             normalizedDateString = normalizedDateString.replace(/\+(\d{2})$/, '+$1:00');
+            console.log('Normalized:', normalizedDateString);
             const date = new Date(normalizedDateString);
+            console.log('Parsed Date:', date);
+            console.log('Current time:', now);
             const secondsAgo = Math.floor((now - date) / 1000);
+            console.log('Seconds ago:', secondsAgo);
 
-            if (secondsAgo < 10) return 'just now';
-            if (secondsAgo < 60) return 'a few seconds ago';
-
-            const minutesAgo = Math.floor(secondsAgo / 60);
-            if (minutesAgo === 1) return '1 minute ago';
-            if (minutesAgo < 60) return `${minutesAgo} mins ago`;
-
-            const hoursAgo = Math.floor(minutesAgo / 60);
-            if (hoursAgo === 1) return 'an hour ago';
-            if (hoursAgo < 24) return `${hoursAgo} hours ago`;
-
-            const daysAgo = Math.floor(hoursAgo / 24);
-            if (daysAgo === 1) return 'yesterday';
-            if (daysAgo < 7) return `${daysAgo} days ago`;
-            if (daysAgo === 7) return '1 week ago';
-
-            const weeksAgo = Math.floor(daysAgo / 7);
-            if (weeksAgo < 4) return `${weeksAgo} weeks ago`;
-
-            const monthsAgo = Math.floor(daysAgo / 30);
-            if (monthsAgo === 1) return '1 month ago';
-            if (monthsAgo < 12) return `${monthsAgo} months ago`;
-
-            const yearsAgo = Math.floor(monthsAgo / 12);
-            if (yearsAgo === 1) return '1 year ago';
-            return `${yearsAgo} years ago`;
+            let result;
+            if (secondsAgo < 10) result = 'just now';
+            else if (secondsAgo < 60) result = 'a few seconds ago';
+            else {
+                const minutesAgo = Math.floor(secondsAgo / 60);
+                if (minutesAgo === 1) result = '1 minute ago';
+                else if (minutesAgo < 60) result = `${minutesAgo} mins ago`;
+                else {
+                    const hoursAgo = Math.floor(minutesAgo / 60);
+                    if (hoursAgo === 1) result = 'an hour ago';
+                    else if (hoursAgo < 24) result = `${hoursAgo} hours ago`;
+                    else {
+                        const daysAgo = Math.floor(hoursAgo / 24);
+                        if (daysAgo === 1) result = 'yesterday';
+                        else if (daysAgo < 7) result = `${daysAgo} days ago`;
+                        else if (daysAgo === 7) result = '1 week ago';
+                        else {
+                            const weeksAgo = Math.floor(daysAgo / 7);
+                            if (weeksAgo < 4) result = `${weeksAgo} weeks ago`;
+                            else {
+                                const monthsAgo = Math.floor(daysAgo / 30);
+                                if (monthsAgo === 1) result = '1 month ago';
+                                else if (monthsAgo < 12) result = `${monthsAgo} months ago`;
+                                else {
+                                    const yearsAgo = Math.floor(monthsAgo / 12);
+                                    if (yearsAgo === 1) result = '1 year ago';
+                                    else result = `${yearsAgo} years ago`;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            console.log('Final result:', result);
+            return result;
         }
 
         async function showSessions() {
@@ -470,7 +484,10 @@
                     const info = document.createElement('div');
                     info.className = 'session-item-info';
                     const signalUpdatedAt = signalUpdates[session.id];
-                    info.textContent = `Updated: ${signalUpdatedAt ? formatRelativeTime(signalUpdatedAt) : 'never'}`;
+                    console.log(`Session ${session.title} (${session.id}):`, signalUpdatedAt);
+                    const formattedTime = signalUpdatedAt ? formatRelativeTime(signalUpdatedAt) : 'never';
+                    console.log(`Session ${session.title} formatted:`, formattedTime);
+                    info.textContent = `Updated: ${formattedTime}`;
                     div.appendChild(title);
                     div.appendChild(info);
                     div.onclick = () => selectSession(session.id, session.title);
