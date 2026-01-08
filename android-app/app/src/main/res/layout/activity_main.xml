@@ -88,15 +88,10 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="FIX"
-            android:textSize="20sp"
+            android:textSize="18sp"
             android:textStyle="bold"
-            android:textColor="#000000"
-            android:shadowColor="#ff0000"
-            android:shadowDx="0"
-            android:shadowDy="0"
-            android:shadowRadius="60"
+            android:textColor="#ffffff"
             android:background="@drawable/control_button_fix"
-            android:foreground="?attr/selectableItemBackground"
             android:stateListAnimator="@null" />
 
         <Button
@@ -105,15 +100,10 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="WARN"
-            android:textSize="20sp"
+            android:textSize="18sp"
             android:textStyle="bold"
             android:textColor="#ffffff"
-            android:shadowColor="#2196F3"
-            android:shadowDx="0"
-            android:shadowDy="0"
-            android:shadowRadius="70"
             android:background="@drawable/control_button_warn"
-            android:foreground="?attr/selectableItemBackground"
             android:stateListAnimator="@null" />
 
         <Button
@@ -124,9 +114,8 @@
             android:text="CORRECT"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:textColor="#000000"
+            android:textColor="#ffffff"
             android:background="@drawable/control_button_correct"
-            android:foreground="?attr/selectableItemBackground"
             android:stateListAnimator="@null" />
 
     </LinearLayout>

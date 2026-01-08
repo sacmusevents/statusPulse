@@ -46,6 +46,14 @@ class OverlayService : Service() {
             instance?.stopSelf()
             instance = null
         }
+
+        fun isSessionActive(): Boolean {
+            return instance != null
+        }
+
+        fun updateSignalColorGlobally(color: String) {
+            instance?.updateSignalColor(color)
+        }
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
@@ -82,7 +90,7 @@ class OverlayService : Service() {
         }
 
         val params = WindowManager.LayoutParams(
-            1200,
+            960,
             112,
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                 WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
@@ -154,7 +162,7 @@ class OverlayService : Service() {
         greenButton.setOnClickListener { updateSignalColor("green") }
     }
 
-    private fun updateSignalColor(color: String) {
+    fun updateSignalColor(color: String) {
         serviceScope.launch(Dispatchers.IO) {
             try {
                 val now = LocalDateTime.now()
