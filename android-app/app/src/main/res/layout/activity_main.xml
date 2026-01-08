@@ -94,7 +94,7 @@
             android:shadowColor="#ff0000"
             android:shadowDx="0"
             android:shadowDy="0"
-            android:shadowRadius="8"
+            android:shadowRadius="24"
             android:background="@drawable/control_button_fix"
             android:foreground="?attr/selectableItemBackground"
             android:stateListAnimator="@null" />
@@ -108,10 +108,10 @@
             android:textSize="18sp"
             android:textStyle="bold"
             android:textColor="#ffffff"
-            android:shadowColor="#ffff00"
+            android:shadowColor="#2196F3"
             android:shadowDx="0"
             android:shadowDy="0"
-            android:shadowRadius="10"
+            android:shadowRadius="30"
             android:background="@drawable/control_button_warn"
             android:foreground="?attr/selectableItemBackground"
             android:stateListAnimator="@null" />
