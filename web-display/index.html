@@ -155,7 +155,7 @@
 
         .lights-container {
             display: flex;
-            gap: 60px;
+            gap: 120px;
             justify-content: center;
             align-items: center;
             flex: 1;
@@ -195,15 +195,6 @@
             box-shadow: 0 0 50px rgba(255, 255, 0, 0.8), inset 0 0 20px rgba(255, 255, 0, 0.4);
         }
 
-        .light.green {
-            background-color: #00ff00;
-        }
-
-        .light.green.active {
-            opacity: 1;
-            box-shadow: 0 0 50px rgba(0, 255, 0, 0.8), inset 0 0 20px rgba(0, 255, 0, 0.4);
-        }
-
         .light.inactive {
             opacity: 0.3;
         }
@@ -236,9 +227,20 @@
                 <div style="width: 120px;"></div>
             </div>
             <div class="lights-container">
-                <div class="light red" id="redLight">RED</div>
-                <div class="light yellow" id="yellowLight">YELLOW</div>
-                <div class="light green active" id="greenLight">GREEN</div>
+                <div class="light red" id="redLight">
+                    <svg viewBox="0 0 100 100" width="80" height="80" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M50 10 C72.9 10 91 28.1 91 51 C91 73.9 72.9 92 50 92 C27.1 92 9 73.9 9 51 C9 28.1 27.1 10 50 10 Z" fill="none" stroke="white" stroke-width="2"/>
+                        <rect x="46" y="25" width="8" height="40" rx="2" fill="white"/>
+                        <circle cx="50" cy="70" r="4" fill="white"/>
+                    </svg>
+                </div>
+                <div class="light yellow" id="yellowLight">
+                    <svg viewBox="0 0 100 100" width="80" height="80" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M50 10 C72.9 10 91 28.1 91 51 C91 73.9 72.9 92 50 92 C27.1 92 9 73.9 9 51 C9 28.1 27.1 10 50 10 Z" fill="none" stroke="black" stroke-width="2"/>
+                        <rect x="46" y="25" width="8" height="40" rx="2" fill="black"/>
+                        <circle cx="50" cy="70" r="4" fill="black"/>
+                    </svg>
+                </div>
             </div>
             <div class="footer">
                 <div id="footer-info">Connected to session</div>
@@ -335,26 +337,23 @@
         function updateLights(color) {
             const redLight = document.getElementById('redLight');
             const yellowLight = document.getElementById('yellowLight');
-            const greenLight = document.getElementById('greenLight');
 
             // Reset all lights
-            [redLight, yellowLight, greenLight].forEach(light => {
-                light.classList.remove('red', 'yellow', 'green', 'active', 'inactive');
+            [redLight, yellowLight].forEach(light => {
+                light.classList.remove('red', 'yellow', 'active', 'inactive');
             });
 
-            // Set active light
+            // Set active light (default to both inactive if green)
             if (color === 'red') {
                 redLight.classList.add('red', 'active');
                 yellowLight.classList.add('yellow', 'inactive');
-                greenLight.classList.add('green', 'inactive');
             } else if (color === 'yellow') {
                 redLight.classList.add('red', 'inactive');
                 yellowLight.classList.add('yellow', 'active');
-                greenLight.classList.add('green', 'inactive');
-            } else if (color === 'green') {
+            } else {
+                // Green (default) - both inactive
                 redLight.classList.add('red', 'inactive');
                 yellowLight.classList.add('yellow', 'inactive');
-                greenLight.classList.add('green', 'active');
             }
         }
 
