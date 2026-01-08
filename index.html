@@ -385,8 +385,10 @@
 
         function formatRelativeTime(dateString) {
             const now = new Date();
-            // Normalize timestamp format: replace space with 'T' for ISO 8601 compatibility
-            const normalizedDateString = dateString.replace(' ', 'T');
+            // Normalize timestamp format: replace space with 'T' and fix timezone offset format
+            let normalizedDateString = dateString.replace(' ', 'T');
+            // Convert +00 to +00:00 for proper ISO 8601 parsing
+            normalizedDateString = normalizedDateString.replace(/\+(\d{2})$/, '+$1:00');
             const date = new Date(normalizedDateString);
             const secondsAgo = Math.floor((now - date) / 1000);
 
