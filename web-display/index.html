@@ -184,22 +184,20 @@
             background-color: transparent;
         }
 
-        .light.red.active {
-            opacity: 1;
-            filter: drop-shadow(0 0 60px rgba(255, 165, 0, 1)) drop-shadow(0 0 120px rgba(255, 165, 0, 0.8)) drop-shadow(0 0 180px rgba(255, 165, 0, 0.5));
-        }
-
-        .light.yellow {
-            background-color: transparent;
-        }
-
-        .light.yellow.active {
+        /* Default state - white circle with white glow */
+        .light.red.inactive {
             opacity: 1;
             filter: drop-shadow(0 0 60px rgba(255, 255, 255, 1)) drop-shadow(0 0 120px rgba(255, 255, 255, 0.8)) drop-shadow(0 0 180px rgba(255, 255, 255, 0.5));
         }
 
+        /* Alert state - red circle with red glow */
+        .light.red.active {
+            opacity: 1;
+            filter: drop-shadow(0 0 60px rgba(255, 0, 0, 1)) drop-shadow(0 0 120px rgba(255, 0, 0, 0.8)) drop-shadow(0 0 180px rgba(255, 0, 0, 0.5));
+        }
+
         .light.inactive {
-            opacity: 0.3;
+            opacity: 1;
         }
 
         .footer {
@@ -231,13 +229,6 @@
             </div>
             <div class="lights-container">
                 <div class="light red" id="redLight">
-                    <svg viewBox="0 0 100 100" width="320" height="320" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M50 10 C72.9 10 91 28.1 91 51 C91 73.9 72.9 92 50 92 C27.1 92 9 73.9 9 51 C9 28.1 27.1 10 50 10 Z" fill="#FFA500" stroke="#FFA500" stroke-width="6"/>
-                        <rect x="46" y="25" width="8" height="40" rx="2" fill="#000000"/>
-                        <circle cx="50" cy="70" r="5" fill="#000000"/>
-                    </svg>
-                </div>
-                <div class="light yellow" id="yellowLight">
                     <svg viewBox="0 0 100 100" width="320" height="320" xmlns="http://www.w3.org/2000/svg">
                         <path d="M50 10 C72.9 10 91 28.1 91 51 C91 73.9 72.9 92 50 92 C27.1 92 9 73.9 9 51 C9 28.1 27.1 10 50 10 Z" fill="white" stroke="white" stroke-width="6"/>
                         <rect x="46" y="25" width="8" height="40" rx="2" fill="#000000"/>
@@ -339,24 +330,22 @@
 
         function updateLights(color) {
             const redLight = document.getElementById('redLight');
-            const yellowLight = document.getElementById('yellowLight');
+            const svgPath = redLight.querySelector('path');
 
-            // Reset all lights
-            [redLight, yellowLight].forEach(light => {
-                light.classList.remove('red', 'yellow', 'active', 'inactive');
-            });
+            // Reset classes
+            redLight.classList.remove('active', 'inactive');
 
-            // Set active light (default to both inactive if green)
-            if (color === 'red') {
-                redLight.classList.add('red', 'active');
-                yellowLight.classList.add('yellow', 'inactive');
-            } else if (color === 'yellow') {
-                redLight.classList.add('red', 'inactive');
-                yellowLight.classList.add('yellow', 'active');
+            // Change circle color based on status
+            if (color === 'red' || color === 'yellow') {
+                // Alert state - red circle
+                redLight.classList.add('active');
+                svgPath.setAttribute('fill', '#ff0000');
+                svgPath.setAttribute('stroke', '#ff0000');
             } else {
-                // Green (default) - both inactive
-                redLight.classList.add('red', 'inactive');
-                yellowLight.classList.add('yellow', 'inactive');
+                // Default state - white circle (green)
+                redLight.classList.add('inactive');
+                svgPath.setAttribute('fill', 'white');
+                svgPath.setAttribute('stroke', 'white');
             }
         }
 
