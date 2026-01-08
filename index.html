@@ -423,15 +423,21 @@
                     .select('id, title')
                     .eq('status', 'active');
 
-                // Fetch all signals to get latest updates
+                // Get session IDs for filtering
+                const sessionIds = sessions ? sessions.map(s => s.id) : [];
+
+                // Fetch signals for active sessions only
                 const { data: signals } = await db.from('signals')
-                    .select('session_id, updated_at');
+                    .select('session_id, updated_at')
+                    .in('session_id', sessionIds);
 
                 // Create a map of session_id -> latest signal update time
                 const signalUpdates = {};
-                signals.forEach(signal => {
-                    signalUpdates[signal.session_id] = signal.updated_at;
-                });
+                if (signals) {
+                    signals.forEach(signal => {
+                        signalUpdates[signal.session_id] = signal.updated_at;
+                    });
+                }
 
                 const list = document.getElementById('sessionList');
                 const noSessions = document.getElementById('noSessions');
