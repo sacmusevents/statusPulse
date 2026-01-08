@@ -385,7 +385,9 @@
 
         function formatRelativeTime(dateString) {
             const now = new Date();
-            const date = new Date(dateString);
+            // Normalize timestamp format: replace space with 'T' for ISO 8601 compatibility
+            const normalizedDateString = dateString.replace(' ', 'T');
+            const date = new Date(normalizedDateString);
             const secondsAgo = Math.floor((now - date) / 1000);
 
             if (secondsAgo < 10) return 'just now';
