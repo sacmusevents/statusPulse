@@ -168,14 +168,14 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            transition: box-shadow 0.3s ease;
+            transition: filter 0.3s ease;
             box-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
             font-weight: bold;
             font-size: 14px;
             color: transparent;
             text-transform: uppercase;
             letter-spacing: 2px;
-            will-change: box-shadow;
+            will-change: filter;
             backface-visibility: hidden;
             -webkit-font-smoothing: antialiased;
         }
@@ -186,7 +186,7 @@
 
         .light.red.active {
             opacity: 1;
-            box-shadow: 0 0 60px rgba(255, 0, 0, 1), 0 0 120px rgba(255, 0, 0, 0.8), 0 0 180px rgba(255, 0, 0, 0.5), inset 0 0 30px rgba(255, 0, 0, 0.5);
+            filter: drop-shadow(0 0 60px rgba(255, 0, 0, 1)) drop-shadow(0 0 120px rgba(255, 0, 0, 0.8)) drop-shadow(0 0 180px rgba(255, 0, 0, 0.5));
         }
 
         .light.yellow {
@@ -195,7 +195,7 @@
 
         .light.yellow.active {
             opacity: 1;
-            box-shadow: 0 0 60px rgba(255, 255, 255, 1), 0 0 120px rgba(255, 255, 255, 0.8), 0 0 180px rgba(255, 255, 255, 0.5), inset 0 0 30px rgba(255, 255, 255, 0.5);
+            filter: drop-shadow(0 0 60px rgba(255, 255, 255, 1)) drop-shadow(0 0 120px rgba(255, 255, 255, 0.8)) drop-shadow(0 0 180px rgba(255, 255, 255, 0.5));
         }
 
         .light.inactive {
@@ -239,9 +239,9 @@
                 </div>
                 <div class="light yellow" id="yellowLight">
                     <svg viewBox="0 0 100 100" width="80" height="80" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M50 10 C72.9 10 91 28.1 91 51 C91 73.9 72.9 92 50 92 C27.1 92 9 73.9 9 51 C9 28.1 27.1 10 50 10 Z" fill="none" stroke="white" stroke-width="6"/>
-                        <rect x="46" y="25" width="8" height="40" rx="2" fill="white"/>
-                        <circle cx="50" cy="70" r="5" fill="white"/>
+                        <path d="M50 10 C72.9 10 91 28.1 91 51 C91 73.9 72.9 92 50 92 C27.1 92 9 73.9 9 51 C9 28.1 27.1 10 50 10 Z" fill="white" stroke="white" stroke-width="6"/>
+                        <rect x="46" y="25" width="8" height="40" rx="2" fill="#000000"/>
+                        <circle cx="50" cy="70" r="5" fill="#000000"/>
                     </svg>
                 </div>
             </div>
