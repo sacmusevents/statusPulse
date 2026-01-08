@@ -132,13 +132,18 @@
             font-size: 24px;
             font-weight: bold;
             margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
             padding: 20px;
+            position: relative;
+        }
+
+        #sessionName {
+            width: 100%;
         }
 
         .back-btn {
+            position: absolute;
+            left: 20px;
+            top: 20px;
             background-color: #333333;
             color: #ffffff;
             border: none;
@@ -227,7 +232,6 @@
             <div class="header">
                 <button class="back-btn" onclick="goBack()">← Back</button>
                 <div id="sessionName">Session Name</div>
-                <div style="width: 120px;"></div>
             </div>
             <div class="lights-container">
                 <div class="light red" id="redLight">
