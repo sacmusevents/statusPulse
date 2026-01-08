@@ -184,20 +184,22 @@
             background-color: transparent;
         }
 
-        /* Default state - white circle with white glow */
-        .light.red.inactive {
+        /* Off state - green, circle invisible */
+        .light.red.off {
+            opacity: 0.1;
+            filter: none;
+        }
+
+        /* White state - yellow alert, white circle with white glow */
+        .light.red.white {
             opacity: 1;
             filter: drop-shadow(0 0 60px rgba(255, 255, 255, 1)) drop-shadow(0 0 120px rgba(255, 255, 255, 0.8)) drop-shadow(0 0 180px rgba(255, 255, 255, 0.5));
         }
 
-        /* Alert state - red circle with red glow */
-        .light.red.active {
+        /* Alert state - red, red circle with no glow */
+        .light.red.alert {
             opacity: 1;
-            filter: drop-shadow(0 0 60px rgba(255, 0, 0, 1)) drop-shadow(0 0 120px rgba(255, 0, 0, 0.8)) drop-shadow(0 0 180px rgba(255, 0, 0, 0.5));
-        }
-
-        .light.inactive {
-            opacity: 1;
+            filter: none;
         }
 
         .footer {
@@ -332,20 +334,25 @@
             const redLight = document.getElementById('redLight');
             const svgPath = redLight.querySelector('path');
 
-            // Reset classes
-            redLight.classList.remove('active', 'inactive');
+            // Reset all states
+            redLight.classList.remove('off', 'white', 'alert');
 
-            // Change circle color based on status
-            if (color === 'red' || color === 'yellow') {
-                // Alert state - red circle
-                redLight.classList.add('active');
-                svgPath.setAttribute('fill', '#ff0000');
-                svgPath.setAttribute('stroke', '#ff0000');
-            } else {
-                // Default state - white circle (green)
-                redLight.classList.add('inactive');
+            // Change circle color and glow based on status
+            if (color === 'green') {
+                // Off state - circle invisible
+                redLight.classList.add('off');
                 svgPath.setAttribute('fill', 'white');
                 svgPath.setAttribute('stroke', 'white');
+            } else if (color === 'yellow') {
+                // White state - white circle with glow
+                redLight.classList.add('white');
+                svgPath.setAttribute('fill', 'white');
+                svgPath.setAttribute('stroke', 'white');
+            } else if (color === 'red') {
+                // Alert state - red circle with no glow
+                redLight.classList.add('alert');
+                svgPath.setAttribute('fill', '#ff0000');
+                svgPath.setAttribute('stroke', '#ff0000');
             }
         }
 
