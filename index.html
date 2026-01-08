@@ -130,19 +130,20 @@
            ============================================ */
         #lightDisplay {
             background-color: #000000;
-            justify-content: space-around;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             flex-direction: column;
+            position: relative;
         }
 
         .header {
-            display: none;
+            position: absolute;
+            top: 10px;
+            left: 10px;
         }
 
         .back-btn {
-            position: fixed;
-            top: 10px;
-            left: 10px;
-            z-index: 1000;
             background-color: #333333;
             color: #ffffff;
             border: none;
