@@ -439,9 +439,7 @@
                     signals.forEach(signal => {
                         signalUpdates[signal.session_id] = signal.updated_at;
                     });
-                    console.log('Signal Updates Map:', signalUpdates);
                 }
-                console.log('Sessions:', sessions);
 
                 const list = document.getElementById('sessionList');
                 const noSessions = document.getElementById('noSessions');
