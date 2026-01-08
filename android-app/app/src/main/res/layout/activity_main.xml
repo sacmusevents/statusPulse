@@ -92,6 +92,7 @@
             android:textStyle="bold"
             android:textColor="#ffffff"
             android:background="@drawable/overlay_button_red"
+            android:foreground="?attr/selectableItemBackground"
             android:stateListAnimator="@null" />
 
         <Button
@@ -102,8 +103,9 @@
             android:text="YELLOW"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:textColor="#000000"
+            android:textColor="#ffffff"
             android:background="@drawable/overlay_button_yellow"
+            android:foreground="?attr/selectableItemBackground"
             android:stateListAnimator="@null" />
 
         <Button
@@ -116,6 +118,7 @@
             android:textStyle="bold"
             android:textColor="#ffffff"
             android:background="@drawable/overlay_button_green"
+            android:foreground="?attr/selectableItemBackground"
             android:stateListAnimator="@null" />
 
     </LinearLayout>
