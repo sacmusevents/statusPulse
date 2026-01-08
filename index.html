@@ -264,6 +264,39 @@
         let currentSessionId = null;
         let signalChannel = null;
 
+        function formatRelativeTime(dateString) {
+            const now = new Date();
+            const date = new Date(dateString);
+            const secondsAgo = Math.floor((now - date) / 1000);
+
+            if (secondsAgo < 10) return 'just now';
+            if (secondsAgo < 60) return 'a few seconds ago';
+
+            const minutesAgo = Math.floor(secondsAgo / 60);
+            if (minutesAgo === 1) return '1 minute ago';
+            if (minutesAgo < 60) return `${minutesAgo} mins ago`;
+
+            const hoursAgo = Math.floor(minutesAgo / 60);
+            if (hoursAgo === 1) return 'an hour ago';
+            if (hoursAgo < 24) return `${hoursAgo} hours ago`;
+
+            const daysAgo = Math.floor(hoursAgo / 24);
+            if (daysAgo === 1) return 'yesterday';
+            if (daysAgo < 7) return `${daysAgo} days ago`;
+            if (daysAgo === 7) return '1 week ago';
+
+            const weeksAgo = Math.floor(daysAgo / 7);
+            if (weeksAgo < 4) return `${weeksAgo} weeks ago`;
+
+            const monthsAgo = Math.floor(daysAgo / 30);
+            if (monthsAgo === 1) return '1 month ago';
+            if (monthsAgo < 12) return `${monthsAgo} months ago`;
+
+            const yearsAgo = Math.floor(monthsAgo / 12);
+            if (yearsAgo === 1) return '1 year ago';
+            return `${yearsAgo} years ago`;
+        }
+
         async function showSessions() {
             try {
                 const { data } = await db.from('sessions').select('*').eq('status', 'active');
@@ -293,7 +326,7 @@
                     title.textContent = session.title;
                     const info = document.createElement('div');
                     info.className = 'session-item-info';
-                    info.textContent = `Created: ${new Date(session.created_at).toLocaleString()}`;
+                    info.textContent = `Updated: ${formatRelativeTime(session.updated_at)}`;
                     div.appendChild(title);
                     div.appendChild(info);
                     div.onclick = () => selectSession(session.id, session.title);
