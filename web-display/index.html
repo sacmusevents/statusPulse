@@ -175,6 +175,9 @@
             color: transparent;
             text-transform: uppercase;
             letter-spacing: 2px;
+            will-change: box-shadow;
+            backface-visibility: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
         .light.red {
@@ -183,7 +186,7 @@
 
         .light.red.active {
             opacity: 1;
-            box-shadow: 0 0 50px rgba(255, 0, 0, 0.8), inset 0 0 20px rgba(255, 0, 0, 0.4);
+            box-shadow: 0 0 60px rgba(255, 0, 0, 1), 0 0 120px rgba(255, 0, 0, 0.8), 0 0 180px rgba(255, 0, 0, 0.5), inset 0 0 30px rgba(255, 0, 0, 0.5);
         }
 
         .light.yellow {
