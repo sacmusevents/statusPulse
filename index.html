@@ -418,9 +418,21 @@
 
         async function showSessions() {
             try {
-                const { data } = await db.from('sessions')
-                    .select('id, title, signals(updated_at)')
+                // Fetch active sessions
+                const { data: sessions } = await db.from('sessions')
+                    .select('id, title')
                     .eq('status', 'active');
+
+                // Fetch all signals to get latest updates
+                const { data: signals } = await db.from('signals')
+                    .select('session_id, updated_at');
+
+                // Create a map of session_id -> latest signal update time
+                const signalUpdates = {};
+                signals.forEach(signal => {
+                    signalUpdates[signal.session_id] = signal.updated_at;
+                });
+
                 const list = document.getElementById('sessionList');
                 const noSessions = document.getElementById('noSessions');
                 const status = document.getElementById('status');
@@ -433,13 +445,13 @@
                 const items = list.querySelectorAll('.session-item');
                 items.forEach(item => item.remove());
 
-                if (!data || data.length === 0) {
+                if (!sessions || sessions.length === 0) {
                     noSessions.style.display = 'block';
                     return;
                 }
 
                 noSessions.style.display = 'none';
-                data.forEach(session => {
+                sessions.forEach(session => {
                     const div = document.createElement('div');
                     div.className = 'session-item';
                     const title = document.createElement('div');
@@ -447,7 +459,7 @@
                     title.textContent = session.title;
                     const info = document.createElement('div');
                     info.className = 'session-item-info';
-                    const signalUpdatedAt = session.signals && session.signals[0] ? session.signals[0].updated_at : null;
+                    const signalUpdatedAt = signalUpdates[session.id];
                     info.textContent = `Updated: ${signalUpdatedAt ? formatRelativeTime(signalUpdatedAt) : 'never'}`;
                     div.appendChild(title);
                     div.appendChild(info);
