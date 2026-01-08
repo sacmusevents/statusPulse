@@ -506,26 +506,30 @@
         function updateLights(color) {
             const redLight = document.getElementById('redLight');
             const svgPath = redLight.querySelector('path');
+            const lightDisplay = document.getElementById('lightDisplay');
 
             // Reset all states
             redLight.classList.remove('off', 'white', 'alert');
 
             // Change circle color and glow based on status
             if (color === 'green') {
-                // Off state - circle invisible
+                // Off state - circle invisible, black background
                 redLight.classList.add('off');
                 svgPath.setAttribute('fill', 'white');
                 svgPath.setAttribute('stroke', 'white');
+                lightDisplay.style.backgroundColor = '#000000';
             } else if (color === 'yellow') {
-                // White state - blue circle with glow (information advisory)
+                // Blue circle with blue glow, dark blue background for contrast
                 redLight.classList.add('white');
                 svgPath.setAttribute('fill', '#2196F3');
                 svgPath.setAttribute('stroke', '#2196F3');
+                lightDisplay.style.backgroundColor = '#0a1428';
             } else if (color === 'red') {
-                // Alert state - pink circle with pink glow
+                // Pink circle with pink glow, dark maroon background for contrast
                 redLight.classList.add('alert');
                 svgPath.setAttribute('fill', '#FF1493');
                 svgPath.setAttribute('stroke', '#FF1493');
+                lightDisplay.style.backgroundColor = '#2d0a1a';
             }
         }
 
