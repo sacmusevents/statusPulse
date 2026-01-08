@@ -74,6 +74,8 @@
             max-width: 600px;
             overflow-y: auto;
             max-height: 70vh;
+            position: relative;
+            z-index: 10;
         }
 
         /* Scrollbar styling for better visibility */
@@ -194,12 +196,13 @@
 
         /* Position light behind session list when on main page */
         #sessionSelect .lights-container {
-            position: absolute;
+            position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            z-index: -1;
-            flex: none;
+            z-index: 1;
+            display: flex;
+            pointer-events: none;
         }
 
         .light {
