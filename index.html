@@ -135,36 +135,17 @@
         }
 
         .header {
-            text-align: center;
-            color: #00ff00;
-            font-size: 24px;
-            font-weight: bold;
             margin-bottom: 20px;
             padding: 20px;
             position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100px;
-            width: 100%;
-        }
-
-        #sessionName {
-            color: #00ff00;
-            font-size: 24px;
-            font-weight: bold;
-            text-align: center;
-            margin-top: 5px;
-            display: block;
-            white-space: normal;
-            word-wrap: break-word;
+            min-height: 60px;
         }
 
         .back-btn {
             position: absolute;
             left: 20px;
-            top: 20px;
+            top: 50%;
+            transform: translateY(-50%);
             background-color: #333333;
             color: #ffffff;
             border: none;
@@ -254,7 +235,6 @@
         <div class="screen" id="lightDisplay">
             <div class="header">
                 <button class="back-btn" onclick="goBack()">← Back</button>
-                <div id="sessionName">Session Name</div>
             </div>
             <div class="lights-container">
                 <div class="light red" id="redLight">
@@ -358,7 +338,6 @@
 
         async function selectSession(sessionId, title) {
             currentSessionId = sessionId;
-            document.getElementById('sessionName').textContent = title;
             document.getElementById('sessionSelect').classList.remove('active');
             document.getElementById('lightDisplay').classList.add('active');
 
