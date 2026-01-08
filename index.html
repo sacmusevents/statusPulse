@@ -162,6 +162,11 @@
             position: absolute;
             top: 10px;
             left: 10px;
+            display: none;
+        }
+
+        #lightDisplay .header {
+            display: block;
         }
 
         .back-btn {
@@ -204,6 +209,16 @@
             will-change: filter;
             backface-visibility: hidden;
             -webkit-font-smoothing: antialiased;
+        }
+
+        /* Hide light on session select screen by default */
+        #sessionSelect .light {
+            display: none;
+        }
+
+        /* Show light on session select if they have an active session (went back) */
+        #sessionSelect .light.active-session {
+            display: flex;
         }
 
         /* Responsive sizing for different screens */
@@ -433,6 +448,17 @@
 
         async function selectSession(sessionId, title) {
             currentSessionId = sessionId;
+
+            // Move lights container to light display and remove active-session class
+            const lightsContainer = document.querySelector('.lights-container');
+            const lightDisplay = document.getElementById('lightDisplay');
+            const sessionSelect = document.getElementById('sessionSelect');
+            if (lightsContainer && lightsContainer.parentElement.id === 'sessionSelect') {
+                lightDisplay.appendChild(lightsContainer);
+            }
+            const redLight = document.getElementById('redLight');
+            redLight.classList.remove('active-session');
+
             document.getElementById('sessionSelect').classList.remove('active');
             document.getElementById('lightDisplay').classList.add('active');
 
@@ -495,6 +521,16 @@
                 signalChannel.unsubscribe();
                 signalChannel = null;
             }
+
+            // Move lights container to session select and add active-session class
+            const lightsContainer = document.querySelector('.lights-container');
+            const sessionSelect = document.getElementById('sessionSelect');
+            if (lightsContainer && lightsContainer.parentElement.id === 'lightDisplay') {
+                sessionSelect.appendChild(lightsContainer);
+            }
+            const redLight = document.getElementById('redLight');
+            redLight.classList.add('active-session');
+
             currentSessionId = null;
             document.getElementById('lightDisplay').classList.remove('active');
             document.getElementById('sessionSelect').classList.add('active');
