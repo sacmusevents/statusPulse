@@ -385,17 +385,12 @@
 
         function formatRelativeTime(dateString) {
             const now = new Date();
-            console.log('Raw input:', dateString);
             // Normalize timestamp format: replace space with 'T' and fix timezone offset format
             let normalizedDateString = dateString.replace(' ', 'T');
             // Convert +00 to +00:00 for proper ISO 8601 parsing
             normalizedDateString = normalizedDateString.replace(/\+(\d{2})$/, '+$1:00');
-            console.log('Normalized:', normalizedDateString);
             const date = new Date(normalizedDateString);
-            console.log('Parsed Date:', date);
-            console.log('Current time:', now);
             const secondsAgo = Math.floor((now - date) / 1000);
-            console.log('Seconds ago:', secondsAgo);
 
             let result;
             if (secondsAgo < 10) result = 'just now';
@@ -430,7 +425,6 @@
                     }
                 }
             }
-            console.log('Final result:', result);
             return result;
         }
 
@@ -484,9 +478,7 @@
                     const info = document.createElement('div');
                     info.className = 'session-item-info';
                     const signalUpdatedAt = signalUpdates[session.id];
-                    console.log(`Session ${session.title} (${session.id}):`, signalUpdatedAt);
                     const formattedTime = signalUpdatedAt ? formatRelativeTime(signalUpdatedAt) : 'never';
-                    console.log(`Session ${session.title} formatted:`, formattedTime);
                     info.textContent = `Updated: ${formattedTime}`;
                     div.appendChild(title);
                     div.appendChild(info);
