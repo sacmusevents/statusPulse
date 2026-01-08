@@ -191,6 +191,16 @@
             flex: 1;
         }
 
+        /* Position light behind session list when on main page */
+        #sessionSelect .lights-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: -1;
+            flex: none;
+        }
+
         .light {
             width: 300px;
             height: 300px;
