@@ -43,10 +43,22 @@ class OverlayService : Service() {
 
     companion object {
         private var instance: OverlayService? = null
+        var currentSessionId: String? = null
+        var currentSessionTitle: String? = null
 
         fun stopExistingOverlay() {
             instance?.stopSelf()
             instance = null
+            currentSessionId = null
+            currentSessionTitle = null
+        }
+
+        fun isSessionActive(): Boolean {
+            return currentSessionId != null && instance != null
+        }
+
+        fun updateSignalColorGlobally(color: String) {
+            instance?.updateSignalColor(color)
         }
     }
 
@@ -62,6 +74,10 @@ class OverlayService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         currentSessionId = intent?.getStringExtra("SESSION_ID")
         currentSessionTitle = intent?.getStringExtra("SESSION_TITLE")
+
+        // Update companion object so MainActivity can access session info
+        Companion.currentSessionId = currentSessionId
+        Companion.currentSessionTitle = currentSessionTitle
 
         if (currentSessionId != null && currentSessionTitle != null) {
             setupOverlay()
@@ -202,6 +218,11 @@ class OverlayService : Service() {
         super.onDestroy()
         serviceScope.cancel()
         backgroundScope.cancel()
+
+        // Clear session info from companion object
+        Companion.currentSessionId = null
+        Companion.currentSessionTitle = null
+        Companion.instance = null
 
         // Cancel any pending reset
         if (resetHandler != null && resetRunnable != null) {

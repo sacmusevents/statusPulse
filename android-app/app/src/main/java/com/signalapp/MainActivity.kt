@@ -5,7 +5,9 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.view.View
 import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 
@@ -39,7 +41,38 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, SessionListActivity::class.java))
         }
 
+        // Setup bottom control bar buttons
+        setupControlButtons()
+
         updatePermissionStatus()
+    }
+
+    private fun setupControlButtons() {
+        val controlRedBtn = findViewById<Button>(R.id.controlRedBtn)
+        val controlYellowBtn = findViewById<Button>(R.id.controlYellowBtn)
+        val controlGreenBtn = findViewById<Button>(R.id.controlGreenBtn)
+
+        controlRedBtn.setOnClickListener {
+            OverlayService.updateSignalColorGlobally("red")
+        }
+
+        controlYellowBtn.setOnClickListener {
+            OverlayService.updateSignalColorGlobally("yellow")
+        }
+
+        controlGreenBtn.setOnClickListener {
+            OverlayService.updateSignalColorGlobally("green")
+        }
+    }
+
+    private fun updateControlBarVisibility() {
+        val controlBar = findViewById<LinearLayout>(R.id.controlBar)
+
+        if (OverlayService.isSessionActive()) {
+            controlBar.visibility = View.VISIBLE
+        } else {
+            controlBar.visibility = View.GONE
+        }
     }
 
     private fun updatePermissionStatus() {
@@ -60,6 +93,7 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         updatePermissionStatus()
+        updateControlBarVisibility()
     }
 
     @Deprecated("Deprecated in Java")
