@@ -29,8 +29,6 @@ class OverlayService : Service() {
     private val layoutParamsList = mutableListOf<WindowManager.LayoutParams>()
     private var currentSessionId: String? = null
     private var currentSessionTitle: String? = null
-    // Separate scope for background operations that persists even when app is backgrounded
-    private val backgroundScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
     private var isMoving = false
     private var lastX = 0
@@ -43,22 +41,10 @@ class OverlayService : Service() {
 
     companion object {
         private var instance: OverlayService? = null
-        var currentSessionId: String? = null
-        var currentSessionTitle: String? = null
 
         fun stopExistingOverlay() {
             instance?.stopSelf()
             instance = null
-            currentSessionId = null
-            currentSessionTitle = null
-        }
-
-        fun isSessionActive(): Boolean {
-            return currentSessionId != null && instance != null
-        }
-
-        fun updateSignalColorGlobally(color: String) {
-            instance?.updateSignalColor(color)
         }
     }
 
@@ -75,10 +61,6 @@ class OverlayService : Service() {
         currentSessionId = intent?.getStringExtra("SESSION_ID")
         currentSessionTitle = intent?.getStringExtra("SESSION_TITLE")
 
-        // Update companion object so MainActivity can access session info
-        Companion.currentSessionId = currentSessionId
-        Companion.currentSessionTitle = currentSessionTitle
-
         if (currentSessionId != null && currentSessionTitle != null) {
             setupOverlay()
         } else {
@@ -91,7 +73,7 @@ class OverlayService : Service() {
     private fun setupOverlay() {
         windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
 
-        // Create single overlay in top-left corner with vibrant status buttons
+        // Create single overlay in top-left corner with 56dp height
         val view = LayoutInflater.from(this).inflate(R.layout.overlay_layout, null)
 
         val closeButton: Button = view.findViewById(R.id.close_button)
@@ -100,8 +82,8 @@ class OverlayService : Service() {
         }
 
         val params = WindowManager.LayoutParams(
-            700,
-            120,
+            1200,
+            112,
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                 WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
             else
@@ -173,40 +155,35 @@ class OverlayService : Service() {
     }
 
     private fun updateSignalColor(color: String) {
-        // Use backgroundScope to ensure database updates work even when app is backgrounded
-        backgroundScope.launch {
+        serviceScope.launch(Dispatchers.IO) {
             try {
                 val now = LocalDateTime.now()
                 val formatter = DateTimeFormatter.ISO_DATE_TIME
                 val timestamp = formatter.format(now)
 
                 SupabaseManager.updateSignal(currentSessionId!!, color, timestamp)
-                android.util.Log.d("OverlayService", "Signal updated: $color")
 
-                // Handle timer on main thread
-                Handler(Looper.getMainLooper()).post {
-                    // Cancel existing timer callback
-                    if (resetHandler != null && resetRunnable != null) {
-                        resetHandler!!.removeCallbacks(resetRunnable!!)
+                // Cancel existing timer callback
+                if (resetHandler != null && resetRunnable != null) {
+                    resetHandler!!.removeCallbacks(resetRunnable!!)
+                }
+
+                // Set auto-reset timer for red/yellow (not for green)
+                if (color != "green") {
+                    // Create handler if it doesn't exist
+                    if (resetHandler == null) {
+                        resetHandler = Handler(Looper.getMainLooper())
                     }
 
-                    // Set auto-reset timer for red/yellow (not for green)
-                    if (color != "green") {
-                        // Create handler if it doesn't exist
-                        if (resetHandler == null) {
-                            resetHandler = Handler(Looper.getMainLooper())
-                        }
-
-                        // Create new runnable and post it
-                        resetRunnable = Runnable {
-                            android.util.Log.d("OverlayService", "Auto-resetting to green after 10 seconds")
-                            updateSignalColor("green")
-                        }
-                        resetHandler!!.postDelayed(resetRunnable!!, RESET_TIME)
-                    } else {
-                        // Clear runnable when setting to green
-                        resetRunnable = null
+                    // Create new runnable and post it
+                    resetRunnable = Runnable {
+                        android.util.Log.d("OverlayService", "Auto-resetting to green after 10 seconds")
+                        updateSignalColor("green")
                     }
+                    resetHandler!!.postDelayed(resetRunnable!!, RESET_TIME)
+                } else {
+                    // Clear runnable when setting to green
+                    resetRunnable = null
                 }
             } catch (e: Exception) {
                 android.util.Log.e("OverlayService", "updateSignalColor error", e)
@@ -217,12 +194,6 @@ class OverlayService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         serviceScope.cancel()
-        backgroundScope.cancel()
-
-        // Clear session info from companion object
-        Companion.currentSessionId = null
-        Companion.currentSessionTitle = null
-        Companion.instance = null
 
         // Cancel any pending reset
         if (resetHandler != null && resetRunnable != null) {

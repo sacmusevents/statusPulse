@@ -140,13 +140,31 @@
             font-size: 24px;
             font-weight: bold;
             margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
             padding: 20px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100px;
+            width: 100%;
+        }
+
+        #sessionName {
+            color: #00ff00;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 5px;
+            display: block;
+            white-space: normal;
+            word-wrap: break-word;
         }
 
         .back-btn {
+            position: absolute;
+            left: 20px;
+            top: 20px;
             background-color: #333333;
             color: #ffffff;
             border: none;
@@ -155,6 +173,7 @@
             cursor: pointer;
             font-size: 14px;
             transition: background-color 0.3s ease;
+            z-index: 10;
         }
 
         .back-btn:hover {
@@ -163,57 +182,51 @@
 
         .lights-container {
             display: flex;
-            gap: 60px;
+            gap: 120px;
             justify-content: center;
             align-items: center;
             flex: 1;
         }
 
         .light {
-            width: 150px;
-            height: 150px;
+            width: 600px;
+            height: 600px;
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
-            transition: box-shadow 0.3s ease;
+            transition: filter 0.3s ease;
             box-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
             font-weight: bold;
             font-size: 14px;
             color: transparent;
             text-transform: uppercase;
             letter-spacing: 2px;
+            will-change: filter;
+            backface-visibility: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
         .light.red {
-            background-color: #ff0000;
+            background-color: transparent;
         }
 
-        .light.red.active {
+        /* Off state - green, circle invisible */
+        .light.red.off {
+            opacity: 0.1;
+            filter: none;
+        }
+
+        /* White state - yellow alert, blue circle with blue glow */
+        .light.red.white {
             opacity: 1;
-            box-shadow: 0 0 50px rgba(255, 0, 0, 0.8), inset 0 0 20px rgba(255, 0, 0, 0.4);
+            filter: drop-shadow(0 0 60px rgba(33, 150, 243, 1)) drop-shadow(0 0 120px rgba(33, 150, 243, 0.8)) drop-shadow(0 0 180px rgba(33, 150, 243, 0.5));
         }
 
-        .light.yellow {
-            background-color: #ffff00;
-        }
-
-        .light.yellow.active {
+        /* Alert state - red, red circle with no glow */
+        .light.red.alert {
             opacity: 1;
-            box-shadow: 0 0 50px rgba(255, 255, 0, 0.8), inset 0 0 20px rgba(255, 255, 0, 0.4);
-        }
-
-        .light.green {
-            background-color: #00ff00;
-        }
-
-        .light.green.active {
-            opacity: 1;
-            box-shadow: 0 0 50px rgba(0, 255, 0, 0.8), inset 0 0 20px rgba(0, 255, 0, 0.4);
-        }
-
-        .light.inactive {
-            opacity: 0.3;
+            filter: none;
         }
 
         .footer {
@@ -242,12 +255,15 @@
             <div class="header">
                 <button class="back-btn" onclick="goBack()">← Back</button>
                 <div id="sessionName">Session Name</div>
-                <div style="width: 120px;"></div>
             </div>
             <div class="lights-container">
-                <div class="light red" id="redLight">RED</div>
-                <div class="light yellow" id="yellowLight">YELLOW</div>
-                <div class="light green active" id="greenLight">GREEN</div>
+                <div class="light red" id="redLight">
+                    <svg viewBox="0 0 100 100" width="320" height="320" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M50 10 C72.9 10 91 28.1 91 51 C91 73.9 72.9 92 50 92 C27.1 92 9 73.9 9 51 C9 28.1 27.1 10 50 10 Z" fill="white" stroke="white" stroke-width="6"/>
+                        <rect x="46" y="25" width="8" height="40" rx="2" fill="#000000"/>
+                        <circle cx="50" cy="70" r="5" fill="#000000"/>
+                    </svg>
+                </div>
             </div>
             <div class="footer">
                 <div id="footer-info">Connected to session</div>
@@ -299,7 +315,7 @@
 
         async function showSessions() {
             try {
-                const { data } = await db.from('sessions').select('*').eq('status', 'active');
+                const { data } = await db.from('sessions').select('id, title, updated_at').eq('status', 'active');
                 const list = document.getElementById('sessionList');
                 const noSessions = document.getElementById('noSessions');
                 const status = document.getElementById('status');
@@ -376,27 +392,27 @@
 
         function updateLights(color) {
             const redLight = document.getElementById('redLight');
-            const yellowLight = document.getElementById('yellowLight');
-            const greenLight = document.getElementById('greenLight');
+            const svgPath = redLight.querySelector('path');
 
-            // Reset all lights
-            [redLight, yellowLight, greenLight].forEach(light => {
-                light.classList.remove('red', 'yellow', 'green', 'active', 'inactive');
-            });
+            // Reset all states
+            redLight.classList.remove('off', 'white', 'alert');
 
-            // Set active light
-            if (color === 'red') {
-                redLight.classList.add('red', 'active');
-                yellowLight.classList.add('yellow', 'inactive');
-                greenLight.classList.add('green', 'inactive');
+            // Change circle color and glow based on status
+            if (color === 'green') {
+                // Off state - circle invisible
+                redLight.classList.add('off');
+                svgPath.setAttribute('fill', 'white');
+                svgPath.setAttribute('stroke', 'white');
             } else if (color === 'yellow') {
-                redLight.classList.add('red', 'inactive');
-                yellowLight.classList.add('yellow', 'active');
-                greenLight.classList.add('green', 'inactive');
-            } else if (color === 'green') {
-                redLight.classList.add('red', 'inactive');
-                yellowLight.classList.add('yellow', 'inactive');
-                greenLight.classList.add('green', 'active');
+                // White state - blue circle with glow (information advisory)
+                redLight.classList.add('white');
+                svgPath.setAttribute('fill', '#2196F3');
+                svgPath.setAttribute('stroke', '#2196F3');
+            } else if (color === 'red') {
+                // Alert state - red circle with no glow
+                redLight.classList.add('alert');
+                svgPath.setAttribute('fill', '#ff0000');
+                svgPath.setAttribute('stroke', '#ff0000');
             }
         }
 
