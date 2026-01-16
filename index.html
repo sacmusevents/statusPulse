@@ -132,6 +132,67 @@
             margin-top: 20px;
         }
 
+        .download-section {
+            margin-top: 40px;
+            text-align: center;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .download-divider {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .download-divider::before,
+        .download-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background-color: #333333;
+        }
+
+        .download-divider span {
+            color: #666666;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background-color: #1a1a1a;
+            border: 2px solid #00ff00;
+            border-radius: 12px;
+            padding: 15px 30px;
+            color: #00ff00;
+            font-size: 16px;
+            font-weight: bold;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .download-btn:hover {
+            background-color: #00ff00;
+            color: #000000;
+            transform: translateY(-3px);
+        }
+
+        .download-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .download-info {
+            color: #666666;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+
         .status {
             position: absolute;
             bottom: 20px;
@@ -338,6 +399,19 @@
             .status {
                 font-size: 10px;
             }
+
+            .download-section {
+                margin-top: 20px;
+            }
+
+            .download-btn {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+
+            .download-info {
+                font-size: 11px;
+            }
         }
     </style>
 </head>
@@ -349,6 +423,19 @@
             <div class="session-subtitle">Real-time feedback for any group</div>
             <div class="session-list" id="sessionList">
                 <div class="no-sessions" id="noSessions">Loading displays...</div>
+            </div>
+
+            <div class="download-section">
+                <div class="download-divider"><span>Control Panel</span></div>
+                <a href="https://github.com/sacmusevents/statusPulse/releases/latest/download/app-debug.apk" class="download-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7 10 12 15 17 10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                    Download Android App
+                </a>
+                <div class="download-info">For signal controllers</div>
             </div>
 
             <div class="status disconnected" id="status">Connecting...</div>
