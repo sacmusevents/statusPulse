@@ -27,7 +27,9 @@ android {
         // SUPABASE_KEY is NOT embedded in APK - must be entered by user or decrypted from encrypted form
         // RSA Private key for key encryption (from GitHub secrets or local.properties)
         def privateKeyEnv = System.getenv("RSA_PRIVATE_KEY") ?: localProperties.getProperty('RSA_PRIVATE_KEY', '')
-        buildConfigField "String", "RSA_PRIVATE_KEY", "\"${privateKeyEnv.replace("\\n", "\\\\n")}\""
+        // Escape actual newlines for Java string literal
+        def escapedKey = privateKeyEnv.replace("\r", "").replace("\n", "\\n")
+        buildConfigField "String", "RSA_PRIVATE_KEY", "\"${escapedKey}\""
     }
 
     buildTypes {
