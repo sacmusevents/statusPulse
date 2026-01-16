@@ -37,8 +37,8 @@ class CreateSessionActivity : AppCompatActivity() {
         lifecycleScope.launch(kotlinx.coroutines.Dispatchers.IO) {
             try {
                 val sessionId = UUID.randomUUID().toString()
-                SupabaseManager.insertSession(Session(id = sessionId, title = title, status = "active"))
-                SupabaseManager.insertSignal(Signal(id = UUID.randomUUID().toString(), session_id = sessionId, color = "green"))
+                SupabaseManager.insertSession(Session(id = sessionId, title = title, status = "active"), this@CreateSessionActivity)
+                SupabaseManager.insertSignal(Signal(id = UUID.randomUUID().toString(), session_id = sessionId, color = "green"), this@CreateSessionActivity)
 
                 runOnUiThread {
                     val intent = Intent(this@CreateSessionActivity, MainActivity::class.java)

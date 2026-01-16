@@ -1,5 +1,6 @@
 package com.signalapp
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
@@ -26,7 +27,7 @@ class SessionListActivity : AppCompatActivity() {
     private fun loadSessions(container: LinearLayout) {
         lifecycleScope.launch(kotlinx.coroutines.Dispatchers.IO) {
             try {
-                val sessions = SupabaseManager.getSessions()
+                val sessions = SupabaseManager.getSessions(this@SessionListActivity)
                 runOnUiThread {
                     container.removeAllViews()
                     if (sessions.isEmpty()) {
@@ -75,6 +76,14 @@ class SessionListActivity : AppCompatActivity() {
     }
 
     private fun joinSession(sessionId: String, title: String) {
+        // Save the last session
+        val prefs = getSharedPreferences("SessionPrefs", Context.MODE_PRIVATE)
+        prefs.edit().apply {
+            putString("lastSessionId", sessionId)
+            putString("lastSessionTitle", title)
+            apply()
+        }
+
         stopService(Intent(this, OverlayService::class.java))
         val intent = Intent(this, OverlayService::class.java)
         intent.putExtra("SESSION_ID", sessionId)
@@ -86,7 +95,7 @@ class SessionListActivity : AppCompatActivity() {
     private fun deleteSession(sessionId: String, onComplete: () -> Unit) {
         lifecycleScope.launch(kotlinx.coroutines.Dispatchers.IO) {
             try {
-                SupabaseManager.deleteSession(sessionId)
+                SupabaseManager.deleteSession(sessionId, this@SessionListActivity)
                 runOnUiThread {
                     Toast.makeText(this@SessionListActivity, "Session deleted", Toast.LENGTH_SHORT).show()
                     onComplete()

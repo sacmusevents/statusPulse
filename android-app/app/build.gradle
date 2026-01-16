@@ -20,9 +20,14 @@ android {
         versionCode 1
         versionName "1.0"
 
-        // Build config fields from local.properties
-        buildConfigField "String", "SUPABASE_URL", "\"${localProperties.getProperty('supabase.url', '')}\""
-        buildConfigField "String", "SUPABASE_KEY", "\"${localProperties.getProperty('supabase.key', '')}\""
+        // Build config fields
+        // SUPABASE_URL is hardcoded below (public info, safe to embed)
+        buildConfigField "String", "SUPABASE_URL", "\"https://pgipjbsekpwzrjxjytxv.supabase.co\""
+
+        // SUPABASE_KEY is NOT embedded in APK - must be entered by user or decrypted from encrypted form
+        // RSA Private key for key encryption (from GitHub secrets or local.properties)
+        def privateKeyEnv = System.getenv("RSA_PRIVATE_KEY") ?: localProperties.getProperty('RSA_PRIVATE_KEY', '')
+        buildConfigField "String", "RSA_PRIVATE_KEY", "\"${privateKeyEnv.replace("\\n", "\\\\n")}\""
     }
 
     buildTypes {
@@ -52,5 +57,7 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.2'
     implementation 'com.squareup.okhttp3:okhttp:4.11.0'
     implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0'
+    implementation 'androidx.security:security-crypto:1.1.0-alpha06'
+    implementation 'com.google.zxing:core:3.5.1'
     testImplementation 'junit:junit:4.13.2'
 }

@@ -1,8 +1,10 @@
 package com.signalapp
 
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.graphics.PixelFormat
+import androidx.appcompat.view.ContextThemeWrapper
 import android.os.Build
 import android.os.Handler
 import android.os.IBinder
@@ -55,6 +57,7 @@ class OverlayService : Service() {
         private var instance: OverlayService? = null
         private var onConnectionLostCallback: (() -> Unit)? = null
         private var onPermanentDisconnectCallback: ((sessionId: String?, sessionTitle: String?) -> Unit)? = null
+        private var onSessionClosedCallback: (() -> Unit)? = null
 
         fun stopExistingOverlay() {
             instance?.stopSelf()
@@ -66,6 +69,7 @@ class OverlayService : Service() {
         }
 
         fun updateSignalColorGlobally(color: String) {
+            android.util.Log.d("OverlayService", "[SIGNAL_UPDATE] updateSignalColorGlobally called: color=$color, instance=$instance")
             instance?.updateSignalColor(color)
         }
 
@@ -73,6 +77,7 @@ class OverlayService : Service() {
             instance?.updateSignalColor("green")
             Handler(Looper.getMainLooper()).postDelayed({
                 stopExistingOverlay()
+                onSessionClosed()
             }, 300)
         }
 
@@ -103,6 +108,14 @@ class OverlayService : Service() {
         fun onPermanentDisconnect(sessionId: String?, sessionTitle: String?) {
             onPermanentDisconnectCallback?.invoke(sessionId, sessionTitle)
         }
+
+        fun setOnSessionClosedCallback(callback: (() -> Unit)?) {
+            onSessionClosedCallback = callback
+        }
+
+        fun onSessionClosed() {
+            onSessionClosedCallback?.invoke()
+        }
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
@@ -131,7 +144,8 @@ class OverlayService : Service() {
         windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
 
         // Create single overlay in top-left corner with 56dp height
-        val view = LayoutInflater.from(this).inflate(R.layout.overlay_layout, null)
+        val themedContext = ContextThemeWrapper(this, androidx.appcompat.R.style.Theme_AppCompat)
+        val view = LayoutInflater.from(themedContext).inflate(R.layout.overlay_layout, null)
 
         val closeButton: Button = view.findViewById(R.id.close_button)
         closeButton.setOnClickListener {
@@ -217,12 +231,15 @@ class OverlayService : Service() {
     fun updateSignalColor(color: String) {
         serviceScope.launch(Dispatchers.IO) {
             try {
+                android.util.Log.d("OverlayService", "[SIGNAL_UPDATE] updateSignalColor: color=$color, sessionId=$currentSessionId")
                 // Use UTC time, not local time
-                val now = ZonedDateTime.now(ZoneId.of("UTC"))
-                val formatter = DateTimeFormatter.ISO_DATE_TIME
+                val now = java.time.Instant.now()
+                val formatter = DateTimeFormatter.ISO_INSTANT
                 val timestamp = formatter.format(now)
 
-                SupabaseManager.updateSignal(currentSessionId!!, color, timestamp)
+                android.util.Log.d("OverlayService", "[SIGNAL_UPDATE] Calling SupabaseManager.updateSignal with timestamp=$timestamp")
+                SupabaseManager.updateSignal(currentSessionId!!, color, timestamp, this@OverlayService)
+                android.util.Log.d("OverlayService", "[SIGNAL_UPDATE] SupabaseManager.updateSignal completed successfully")
 
                 // Connection restored - reset retry count
                 resetRetryCount()
@@ -250,14 +267,14 @@ class OverlayService : Service() {
                     resetRunnable = null
                 }
             } catch (e: Exception) {
-                android.util.Log.e("OverlayService", "updateSignalColor error", e)
+                android.util.Log.e("OverlayService", "[SIGNAL_UPDATE] updateSignalColor error: ${e.message}", e)
                 // User action failed - just notify, don't increment retry count
-                handleConnectionError(color, isAutoRetry = false)
+                handleConnectionError(isAutoRetry = false)
             }
         }
     }
 
-    private fun handleConnectionError(color: String, isAutoRetry: Boolean = false) {
+    private fun handleConnectionError(isAutoRetry: Boolean = false) {
         // Only user-triggered failures start reconnecting state
         if (!isAutoRetry && !isReconnecting) {
             isReconnecting = true
@@ -315,7 +332,7 @@ class OverlayService : Service() {
             try {
                 // Try to fetch the session to verify connection
                 if (currentSessionId != null) {
-                    SupabaseManager.getSessions()
+                    SupabaseManager.getSessions(this@OverlayService)
                 }
                 // If successful, reset retry count and schedule next check
                 resetRetryCount()
@@ -323,7 +340,7 @@ class OverlayService : Service() {
             } catch (e: Exception) {
                 // Connection error - use exponential backoff retry
                 android.util.Log.e("OverlayService", "Health check failed: ${e.message}")
-                handleConnectionError("green", isAutoRetry = true) // Use green as dummy, auto-retry
+                handleConnectionError(isAutoRetry = true)
             }
         }
     }

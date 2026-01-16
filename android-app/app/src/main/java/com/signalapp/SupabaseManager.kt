@@ -1,5 +1,6 @@
 package com.signalapp
 
+import android.content.Context
 import kotlinx.serialization.Serializable
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -27,7 +28,6 @@ data class Signal(
 
 object SupabaseManager {
     private val SUPABASE_URL = BuildConfig.SUPABASE_URL
-    private val SUPABASE_KEY = BuildConfig.SUPABASE_KEY
 
     val httpClient = OkHttpClient.Builder()
         .connectTimeout(10, java.util.concurrent.TimeUnit.SECONDS)
@@ -37,7 +37,10 @@ object SupabaseManager {
 
     val json = Json { ignoreUnknownKeys = true }
 
-    fun buildRequest(method: String, table: String, body: String? = null, query: String? = null): Request {
+    fun buildRequest(method: String, table: String, context: Context, body: String? = null, query: String? = null): Request {
+        val supabaseKey = KeyManager.getSupabaseKey(context)
+            ?: throw IllegalStateException("Supabase key not configured. Please enter it in settings.")
+
         val url = if (query != null) {
             "$SUPABASE_URL/rest/v1/$table?$query"
         } else {
@@ -46,8 +49,8 @@ object SupabaseManager {
 
         val requestBuilder = Request.Builder()
             .url(url)
-            .header("apikey", SUPABASE_KEY)
-            .header("Authorization", "Bearer $SUPABASE_KEY")
+            .header("apikey", supabaseKey)
+            .header("Authorization", "Bearer $supabaseKey")
             .header("Content-Type", "application/json")
             .header("Prefer", "return=minimal")
 
@@ -67,9 +70,9 @@ object SupabaseManager {
         return requestBuilder.build()
     }
 
-    suspend fun getSessions(): List<Session> {
+    suspend fun getSessions(context: Context): List<Session> {
         return try {
-            val request = buildRequest("GET", "sessions", null, "status=eq.active")
+            val request = buildRequest("GET", "sessions", context, null, "status=eq.active")
             val response = httpClient.newCall(request).execute()
             val body = response.body?.string() ?: "[]"
             if (response.isSuccessful) {
@@ -84,10 +87,10 @@ object SupabaseManager {
         }
     }
 
-    suspend fun insertSession(session: Session) {
+    suspend fun insertSession(session: Session, context: Context) {
         try {
             val body = json.encodeToString(session)
-            val request = buildRequest("POST", "sessions", body)
+            val request = buildRequest("POST", "sessions", context, body)
             val response = httpClient.newCall(request).execute()
             if (!response.isSuccessful) {
                 android.util.Log.e("SupabaseManager", "insertSession error: ${response.code} - ${response.body?.string()}")
@@ -99,10 +102,10 @@ object SupabaseManager {
         }
     }
 
-    suspend fun insertSignal(signal: Signal) {
+    suspend fun insertSignal(signal: Signal, context: Context) {
         try {
             val body = json.encodeToString(signal)
-            val request = buildRequest("POST", "signals", body)
+            val request = buildRequest("POST", "signals", context, body)
             val response = httpClient.newCall(request).execute()
             if (!response.isSuccessful) {
                 android.util.Log.e("SupabaseManager", "insertSignal error: ${response.code} - ${response.body?.string()}")
@@ -114,27 +117,33 @@ object SupabaseManager {
         }
     }
 
-    suspend fun updateSignal(sessionId: String, color: String, timestamp: String) {
+    suspend fun updateSignal(sessionId: String, color: String, timestamp: String, context: Context) {
         try {
+            android.util.Log.d("SupabaseManager", "[SIGNAL_UPDATE] updateSignal called: sessionId=$sessionId, color=$color, URL=$SUPABASE_URL")
             @Serializable
             data class SignalUpdate(val color: String, val updated_at: String)
 
             val body = json.encodeToString(SignalUpdate(color, timestamp))
-            val request = buildRequest("PATCH", "signals", body, "session_id=eq.$sessionId")
+            android.util.Log.d("SupabaseManager", "[SIGNAL_UPDATE] Request body: $body")
+            val request = buildRequest("PATCH", "signals", context, body, "session_id=eq.$sessionId")
+            android.util.Log.d("SupabaseManager", "[SIGNAL_UPDATE] Making PATCH request to: ${request.url}")
             val response = httpClient.newCall(request).execute()
+            android.util.Log.d("SupabaseManager", "[SIGNAL_UPDATE] Response code: ${response.code}")
             if (!response.isSuccessful) {
-                android.util.Log.e("SupabaseManager", "updateSignal error: ${response.code} - ${response.body?.string()}")
+                val errorBody = response.body?.string()
+                android.util.Log.e("SupabaseManager", "[SIGNAL_UPDATE] updateSignal error: ${response.code} - $errorBody")
                 throw Exception("updateSignal failed: ${response.code}")
             }
+            android.util.Log.d("SupabaseManager", "[SIGNAL_UPDATE] updateSignal successful")
         } catch (e: Exception) {
-            android.util.Log.e("SupabaseManager", "updateSignal exception", e)
+            android.util.Log.e("SupabaseManager", "[SIGNAL_UPDATE] updateSignal exception: ${e.message}", e)
             throw e
         }
     }
 
-    suspend fun deleteSession(sessionId: String) {
+    suspend fun deleteSession(sessionId: String, context: Context) {
         try {
-            val request = buildRequest("DELETE", "sessions", null, "id=eq.$sessionId")
+            val request = buildRequest("DELETE", "sessions", context, null, "id=eq.$sessionId")
             val response = httpClient.newCall(request).execute()
             if (!response.isSuccessful) {
                 android.util.Log.e("SupabaseManager", "deleteSession error: ${response.code} - ${response.body?.string()}")

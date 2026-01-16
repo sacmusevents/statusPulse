@@ -59,6 +59,34 @@
             android:elevation="4dp" />
 
         <Button
+            android:id="@+id/rejoinSessionBtn"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="↺ Rejoin: Last Session"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:background="@drawable/button_secondary"
+            android:textColor="#00ff00"
+            android:stateListAnimator="@null"
+            android:elevation="4dp"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone" />
+
+        <Button
+            android:id="@+id/endSessionBtn"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="⊗ End Session"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:background="@drawable/button_secondary"
+            android:textColor="#ff6b6b"
+            android:stateListAnimator="@null"
+            android:elevation="4dp"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone" />
+
+        <Button
             android:id="@+id/joinSessionBtn"
             android:layout_width="match_parent"
             android:layout_height="56dp"
@@ -68,7 +96,68 @@
             android:background="@drawable/button_secondary"
             android:textColor="#00ff00"
             android:stateListAnimator="@null"
-            android:elevation="4dp" />
+            android:elevation="4dp"
+            android:layout_marginBottom="16dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/openWebAppBtn"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="Open Web App"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:background="@drawable/button_secondary"
+                android:textColor="#00ff00"
+                android:layout_marginEnd="8dp"
+                android:stateListAnimator="@null"
+                android:elevation="4dp" />
+
+            <Button
+                android:id="@+id/copyWebAppUrlBtn"
+                android:layout_width="56dp"
+                android:layout_height="match_parent"
+                android:text="✂"
+                android:textSize="20sp"
+                android:background="@drawable/button_secondary"
+                android:textColor="#00ff00"
+                android:stateListAnimator="@null"
+                android:elevation="4dp"
+                android:layout_marginStart="4dp" />
+
+            <ImageButton
+                android:id="@+id/shareWebAppQrBtn"
+                android:layout_width="56dp"
+                android:layout_height="match_parent"
+                android:src="@drawable/ic_qr_code"
+                android:background="@drawable/button_secondary"
+                android:contentDescription="Share QR Code"
+                android:scaleType="centerInside"
+                android:padding="12dp"
+                android:stateListAnimator="@null"
+                android:elevation="4dp"
+                android:layout_marginStart="4dp" />
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/settingsBtn"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="⚙ Settings"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:background="@drawable/button_secondary"
+            android:textColor="#00ff00"
+            android:stateListAnimator="@null"
+            android:elevation="4dp"
+            android:layout_marginTop="16dp" />
 
     </LinearLayout>
 
