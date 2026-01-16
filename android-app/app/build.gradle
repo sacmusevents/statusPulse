@@ -36,6 +36,14 @@ android {
         release {
             minifyEnabled false
         }
+        debug {
+            // Rename APK output
+            applicationVariants.all { variant ->
+                variant.outputs.all {
+                    outputFileName = "StatusPulse.apk"
+                }
+            }
+        }
     }
 
     compileOptions {
