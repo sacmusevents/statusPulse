@@ -1,0 +1,139 @@
+.screen {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding: 40px;
+  background-color: #000000;
+  color: #ffffff;
+}
+
+.session-title {
+  color: #00ff00;
+  font-size: 36px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.session-subtitle {
+  color: #888888;
+  font-size: 14px;
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+.loading-state, .no-sessions {
+  color: #888888;
+  font-size: 18px;
+  margin: 40px 0;
+}
+
+.session-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  max-width: 600px;
+}
+
+.session-item {
+  background-color: #1a1a1a;
+  border: 2px solid #333333;
+  border-radius: 12px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.session-item:hover {
+  background-color: #2a2a2a;
+  border-color: #00ff00;
+  transform: translateY(-5px);
+}
+
+.session-item-title {
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.session-item-info {
+  color: #888888;
+  font-size: 12px;
+}
+
+.download-section {
+  margin-top: 40px;
+  text-align: center;
+  width: 100%;
+  max-width: 600px;
+}
+
+.download-divider {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.download-divider::before,
+.download-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background-color: #333333;
+}
+
+.download-divider span {
+  color: #666666;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.download-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background-color: #1a1a1a;
+  border: 2px solid #00ff00;
+  border-radius: 12px;
+  padding: 15px 30px;
+  color: #00ff00;
+  font-size: 16px;
+  font-weight: bold;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.download-btn:hover {
+  background-color: #00ff00;
+  color: #000000;
+  transform: translateY(-3px);
+}
+
+.download-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.status {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  font-size: 12px;
+  font-family: monospace;
+}
+
+.status.connected {
+  color: rgba(0, 255, 0, 0.7);
+}
+
+.status.disconnected {
+  color: rgba(255, 100, 100, 0.7);
+}

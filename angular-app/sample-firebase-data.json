@@ -1,0 +1,26 @@
+{
+  "sessions": {
+    "session-1": {
+      "id": "session-1",
+      "title": "Main Conference Hall",
+      "status": "active",
+      "lastUpdated": "2026-08-21T02:35:00.000Z"
+    },
+    "session-2": {
+      "id": "session-2",
+      "title": "Workshop Room A",
+      "status": "active",
+      "lastUpdated": "2026-08-21T02:35:00.000Z"
+    }
+  },
+  "signals": {
+    "session-1": {
+      "color": "green",
+      "updatedAt": "2026-08-21T02:35:00.000Z"
+    },
+    "session-2": {
+      "color": "yellow",
+      "updatedAt": "2026-08-21T02:35:00.000Z"
+    }
+  }
+}

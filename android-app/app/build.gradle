@@ -21,8 +21,9 @@ android {
         versionName "1.0"
 
         // Build config fields
-        // SUPABASE_URL is hardcoded below (public info, safe to embed)
-        buildConfigField "String", "SUPABASE_URL", "\"https://pgipjbsekpwzrjxjytxv.supabase.co\""
+        // FIREBASE_DB_URL is hardcoded below (public database URL)
+        buildConfigField "String", "FIREBASE_DB_URL", "\"https://statuspulse-dd480-default-rtdb.firebaseio.com\""
+        buildConfigField "String", "SUPABASE_URL", "\"https://statuspulse-dd480-default-rtdb.firebaseio.com\""
 
         // SUPABASE_KEY is NOT embedded in APK - must be entered by user or decrypted from encrypted form
         // RSA Private key for key encryption (from GitHub secrets or local.properties)

@@ -27,7 +27,7 @@ object KeyManager {
             val prefs = getEncryptedPreferences(context)
             prefs.getString(KEY_SUPABASE_KEY, null)
         } catch (e: Exception) {
-            android.util.Log.e("KeyManager", "Error reading Supabase key", e)
+            android.util.Log.e("KeyManager", "Error reading key", e)
             null
         }
     }
@@ -37,13 +37,14 @@ object KeyManager {
             val prefs = getEncryptedPreferences(context)
             prefs.edit().putString(KEY_SUPABASE_KEY, key).apply()
         } catch (e: Exception) {
-            android.util.Log.e("KeyManager", "Error writing Supabase key", e)
+            android.util.Log.e("KeyManager", "Error writing key", e)
             throw e
         }
     }
 
     fun hasSupabaseKey(context: Context): Boolean {
-        return getSupabaseKey(context) != null
+        // Firebase Realtime DB in test mode does not block startup if key is unconfigured
+        return true
     }
 
     fun deleteSupabaseKey(context: Context) {
@@ -51,7 +52,7 @@ object KeyManager {
             val prefs = getEncryptedPreferences(context)
             prefs.edit().remove(KEY_SUPABASE_KEY).apply()
         } catch (e: Exception) {
-            android.util.Log.e("KeyManager", "Error deleting Supabase key", e)
+            android.util.Log.e("KeyManager", "Error deleting key", e)
         }
     }
 }

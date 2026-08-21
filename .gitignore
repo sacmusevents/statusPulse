@@ -24,3 +24,5 @@ dist/
 .env.local
 *.pem
 *.key
+*firebase-adminsdk*.json
+serviceAccountKey.json
