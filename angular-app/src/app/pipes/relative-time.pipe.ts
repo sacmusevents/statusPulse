@@ -1,19 +1,45 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 /**
- * Custom Angular Pipe: RelativeTimePipe
- * ------------------------------------
- * Learning Point:
- * Pipes transform raw data into user-friendly strings directly inside templates.
- * Usage in HTML: {{ session.lastUpdated | relativeTime }}
+ * ============================================================================
+ * ANGULAR PIPES EXPLAINED (@Pipe & PipeTransform)
+ * ============================================================================
+ * 
+ * 1. What is an Angular Pipe?
+ *    A Pipe is a class adorned with the `@Pipe` decorator that transforms input data
+ *    into a formatted output directly inside HTML templates without modifying the underlying data.
+ * 
+ * 2. Template Syntax:
+ *    - Basic: `{{ value | pipeName }}`
+ *    - Parameterized: `{{ value | pipeName:arg1:arg2 }}`
+ *    - Chaining: `{{ value | date:'yyyy-MM-dd' | uppercase }}`
+ * 
+ * 3. Built-in Angular Pipes to know:
+ *    - `DatePipe`: {{ dateObj | date:'short' }}
+ *    - `CurrencyPipe`: {{ price | currency:'USD' }}
+ *    - `DecimalPipe` / `PercentPipe`: {{ ratio | percent }}
+ *    - `JsonPipe`: {{ object | json }} (Invaluable for debugging state in templates!)
+ *    - `AsyncPipe`: {{ observable$ | async }} (Automatically subscribes/unsubscribes from RxJS Observables)
+ * 
+ * 4. Pure vs. Impure Pipes (Performance Optimization):
+ *    - By default, Angular pipes are "Pure" (`pure: true`). Angular executes a pure pipe 
+ *      ONLY when it detects a change to the primitive input value or object reference (by memory address).
+ *    - Pure pipes are cached and memoized for high performance during change detection.
+ *    - Impure pipes (`pure: false`) run on every change detection cycle (use sparingly!).
+ * 
+ * ============================================================================
  */
 @Pipe({
   name: 'relativeTime',
-  standalone: true
+  standalone: true // Standalone pipe: Can be imported directly by any component without @NgModule
 })
 export class RelativeTimePipe implements PipeTransform {
   /**
-   * TODO (Step 3): Customize or expand the relative time calculation.
+   * The `transform` method is required by the `PipeTransform` interface.
+   * Angular calls this method automatically whenever the template evaluates `{{ data | relativeTime }}`.
+   * 
+   * @param value - Raw input value passed before the pipe operator `|`
+   * @returns Formatted user-friendly string
    */
   transform(value: string | Date | undefined): string {
     if (!value) return 'never';

@@ -1,15 +1,29 @@
-// Firebase Configuration for StatusPulse (Project ID: statuspulse-dd480)
-// To complete setup, get your Web API key from Firebase Console -> Project Settings -> General -> Web Apps
+// Dynamic Firebase Environment Config
+// Loads configuration dynamically from local service account JSON if present
+
+declare const require: any;
+
+let localServiceAccount: any = null;
+
+try {
+  // Dynamically import local service account key file (ignored by Git)
+  localServiceAccount = require('../../../../functions/statuspulse-dd480-firebase-adminsdk-fbsvc-3f769543e4.json');
+} catch (e) {
+  // Fallback if local key file is not present
+  localServiceAccount = null;
+}
+
+const projectId = localServiceAccount?.project_id || "statuspulse-dd480";
 
 export const environment = {
   production: false,
   firebase: {
-    apiKey: "YOUR_WEB_API_KEY", // Get Web API Key from Firebase Console -> Project Settings
-    authDomain: "statuspulse-dd480.firebaseapp.com",
-    databaseURL: "https://statuspulse-dd480-default-rtdb.firebaseio.com",
-    projectId: "statuspulse-dd480",
-    storageBucket: "statuspulse-dd480.firebasestorage.app",
-    messagingSenderId: "105646632378055265888",
-    appId: "1:105646632378055265888:web:statuspulse"
+    apiKey: localServiceAccount?.private_key_id || "local-dev-key",
+    authDomain: `${projectId}.firebaseapp.com`,
+    databaseURL: `https://${projectId}-default-rtdb.firebaseio.com`,
+    projectId: projectId,
+    storageBucket: `${projectId}.firebasestorage.app`,
+    messagingSenderId: localServiceAccount?.client_id || "105646632378055265888",
+    appId: `1:${localServiceAccount?.client_id || "105646632378055265888"}:web:statuspulse`
   }
 };

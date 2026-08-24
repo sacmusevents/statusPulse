@@ -5,13 +5,27 @@ import { FirebaseService } from '../../services/firebase.service';
 import { SignalColor } from '../../models/session.model';
 
 /**
- * Angular Component: LightDisplayComponent
- * ----------------------------------------
- * Learning Point:
- * Demonstrates:
- * 1. Angular Router parameters (`ActivatedRoute`).
- * 2. Component Lifecycle Hooks: `ngOnInit` (on component load) & `ngOnDestroy` (on component tear-down).
- * 3. Cleaning up subscriptions to avoid memory leaks.
+ * ============================================================================
+ * ANGULAR ROUTING & LIFECYCLE HOOKS EXPLAINED
+ * ============================================================================
+ * 
+ * 1. Router Route Parameters (`ActivatedRoute`):
+ *    - Routes can define dynamic URL segments: `{ path: 'light/:id', component: LightDisplayComponent }`
+ *    - Access parameter values in TypeScript using `ActivatedRoute`:
+ *      `const id = this.route.snapshot.paramMap.get('id');`
+ * 
+ * 2. Component Lifecycle Hooks (`OnInit`, `OnDestroy`):
+ *    Angular components go through a lifecycle managed by Angular's engine:
+ *    - `ngOnInit()`: Called once when the component is created and inputs are set.
+ *       Ideal for starting subscriptions, fetching API data, reading route params.
+ *    - `ngOnDestroy()`: Called once right before Angular destroys the component 
+ *      (e.g., when the user navigates away to another page).
+ * 
+ * 3. Memory Leak Prevention:
+ *    Long-lived subscriptions (WebSockets, Realtime DB listeners, RxJS Observables, setIntervals)
+ *    WILL stay alive in memory if not explicitly closed! Always clean them up inside `ngOnDestroy()`.
+ * 
+ * ============================================================================
  */
 @Component({
   selector: 'app-light-display',
@@ -30,6 +44,7 @@ export class LightDisplayComponent implements OnInit, OnDestroy {
   sessionTitle = signal<string>('Connected to Session');
   currentColor = signal<SignalColor>('green');
 
+  // Stores the teardown function for real-time listener
   private unsubscribeSignal?: () => void;
 
   ngOnInit(): void {
@@ -38,13 +53,13 @@ export class LightDisplayComponent implements OnInit, OnDestroy {
     if (id) {
       this.sessionId.set(id);
 
-      // Read optional state passed via router
+      // Read optional state object passed during navigation
       const state = history.state;
       if (state?.title) {
         this.sessionTitle.set(state.title);
       }
 
-      // TODO (Step 4): Connect to real-time updates via FirebaseService
+      // Subscribe to real-time database changes
       this.unsubscribeSignal = this.firebaseService.subscribeToSignal(id, (newColor) => {
         this.currentColor.set(newColor);
       });
@@ -52,7 +67,7 @@ export class LightDisplayComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    // Clean up Firebase listener when navigating away
+    // Crucial cleanup: Unsubscribe real-time listener when leaving page to prevent memory leaks
     if (this.unsubscribeSignal) {
       this.unsubscribeSignal();
     }

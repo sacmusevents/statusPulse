@@ -6,12 +6,31 @@ import { Session } from '../../models/session.model';
 import { RelativeTimePipe } from '../../pipes/relative-time.pipe';
 
 /**
- * Angular Component: SessionListComponent
- * ---------------------------------------
- * Learning Point:
- * Modern Angular components use `standalone: true` and `signals` for reactive state.
- * - `signal()` creates reactive state variable that updates the DOM automatically when changed.
- * - `inject(FirebaseService)` is the modern syntax for Dependency Injection in Angular.
+ * ============================================================================
+ * ANGULAR STANDALONE COMPONENTS & SIGNALS EXPLAINED
+ * ============================================================================
+ * 
+ * 1. What is a Standalone Component? (`standalone: true`)
+ *    Introduced in modern Angular (v14+), standalone components do NOT require legacy 
+ *    `@NgModule` wrapper files. Components explicitly list their own direct dependencies 
+ *    in the `imports` array (e.g. `imports: [CommonModule, RelativeTimePipe]`).
+ * 
+ * 2. What are Angular Signals? (`signal()`)
+ *    Signals are Angular's modern reactive state primitive:
+ *    - `mySignal = signal(initialValue)`: Creates a reactive signal container.
+ *    - Read value in TypeScript: `this.mySignal()` (call it like a function).
+ *    - Read value in HTML: `{{ mySignal() }}`
+ *    - Update value: `this.mySignal.set(newValue)` or `this.mySignal.update(val => val + 1)`
+ * 
+ *    Why Signals outshine traditional change detection:
+ *    When a signal changes, Angular precisely targets and updates ONLY the specific DOM 
+ *    nodes that read that signal, eliminating unnecessary component tree diffing!
+ * 
+ * 3. Component Lifecycle:
+ *    - `ngOnInit()`: Called automatically by Angular ONCE after component inputs/DI are ready.
+ *      Ideal location for initial API calls and data fetching.
+ * 
+ * ============================================================================
  */
 @Component({
   selector: 'app-session-list',
@@ -21,18 +40,19 @@ import { RelativeTimePipe } from '../../pipes/relative-time.pipe';
   styleUrl: './session-list.component.css'
 })
 export class SessionListComponent implements OnInit {
+  // Dependency Injection using inject() function
   private firebaseService = inject(FirebaseService);
   private router = inject(Router);
 
-  // Angular Signals for reactive UI state
+  // Angular Signals holding reactive component state
   sessions = signal<Session[]>([]);
   isLoading = signal<boolean>(true);
   connectionStatus = signal<string>('Connecting...');
 
   async ngOnInit(): Promise<void> {
     try {
-      // TODO: Call firebaseService to fetch real sessions
       const data = await this.firebaseService.getActiveSessions();
+      // Update Signal state
       this.sessions.set(data);
       this.connectionStatus.set('Connected');
     } catch (error) {
@@ -44,7 +64,7 @@ export class SessionListComponent implements OnInit {
   }
 
   selectSession(session: Session): void {
-    // Navigate to the light display screen for this session using Angular Router
+    // Angular Router programmatic navigation
     this.router.navigate(['/light', session.id], { state: { title: session.title } });
   }
 }

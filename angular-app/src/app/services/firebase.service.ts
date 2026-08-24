@@ -5,12 +5,34 @@ import { environment } from '../environments/environment';
 import { Session, SignalColor } from '../models/session.model';
 
 /**
- * Angular Service: FirebaseService
- * --------------------------------
- * Connects directly to Firebase Realtime Database SDK.
+ * ============================================================================
+ * ANGULAR SERVICES & DEPENDENCY INJECTION (DI) EXPLAINED (@Injectable)
+ * ============================================================================
+ * 
+ * 1. What is an Angular Service?
+ *    A Service is a class used to organize and share data, state, HTTP/API calls,
+ *    or business logic across multiple components. Services keep components "thin"
+ *    by separating presentation logic (UI) from data management.
+ * 
+ * 2. What is Dependency Injection (DI)?
+ *    DI is a design pattern where Angular instantiates and delivers instances of 
+ *    services to classes that require them, rather than components creating instances manually
+ *    (e.g. `const s = new FirebaseService()` is an anti-pattern in Angular!).
+ * 
+ * 3. Service Scope & Providers (`providedIn`):
+ *    - `providedIn: 'root'`: Registers the service as a application-wide SINGLETON.
+ *      Angular creates only ONE instance for the entire application, shared by all components.
+ *    - Component-level providers: `@Component({ providers: [MyService] })` creates a NEW instance 
+ *      scoped exclusively to that component lifecycle.
+ * 
+ * 4. How to Inject a Service into a Component:
+ *    - Modern Angular (v14+): `private myService = inject(MyService);`
+ *    - Classic Angular: `constructor(private myService: MyService) {}`
+ * 
+ * ============================================================================
  */
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root' // Application-wide Singleton: Available anywhere in the app
 })
 export class FirebaseService {
   private app: FirebaseApp;

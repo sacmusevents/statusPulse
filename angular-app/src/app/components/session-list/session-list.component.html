@@ -1,13 +1,34 @@
+<!--
+  ============================================================================
+  ANGULAR TEMPLATE SYNTAX EXPLAINED
+  ============================================================================
+
+  1. Modern Control Flow Blocks:
+     - `@if (condition) { ... } @else { ... }`: Native conditional rendering (replaces legacy *ngIf).
+     - `@for (item of items(); track item.id) { ... } @empty { ... }`: Native loop (replaces legacy *ngFor).
+       * Note: `track item.id` is mandatory for high-performance DOM node reuse during list updates!
+
+  2. Event Binding Syntax: `(click)="handler()"`
+     - Parentheses `()` bind DOM events (click, input, submit) to TypeScript methods.
+
+  3. Property & Class Binding Syntax: `[class.connected]="condition"`
+     - Square brackets `[]` evaluate TypeScript expressions and bind results to HTML attributes or CSS classes.
+
+  4. Pipe Syntax: `{{ value | relativeTime }}`
+     - Converts raw values into user-friendly strings dynamically inside HTML.
+
+  ============================================================================
+-->
 <div class="screen active">
   <div class="session-title">StatusPulse</div>
   <div class="session-subtitle">Real-time feedback powered by Angular & Firebase</div>
 
-  <!-- Modern Angular Control Flow: @if -->
+  <!-- Modern Angular Conditional Control Flow: @if -->
   @if (isLoading()) {
     <div class="loading-state">Loading active sessions...</div>
   } @else {
     <div class="session-list">
-      <!-- Modern Angular Control Flow: @for -->
+      <!-- Modern Angular Loop Control Flow: @for -->
       @for (session of sessions(); track session.id) {
         <div class="session-item" (click)="selectSession(session)">
           <div class="session-item-title">{{ session.title }}</div>
